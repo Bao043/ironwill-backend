@@ -3267,8 +3267,9 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
       <div class="f-hint">備份專用的 Apps Script 網址（跟寄信那支分開），結尾是 /exec</div>
       <input class="f-in" id="bkEndpoint" placeholder="https://script.google.com/macros/s/…/exec"></div>
     <div class="f"><div class="f-q">管理密碼</div>
-      <div class="f-hint">跟備份 Apps Script 第 18 行 ADMIN_PIN 設的一樣。只存在這支裝置上，不會上傳；跟「通知信箱」那組共用，填過一邊另一邊就會帶入</div>
-      <input class="f-in" id="bkPin" type="password" autocomplete="off" placeholder="你設的管理密碼"></div>
+      <div class="f-hint">跟備份 Apps Script 裡 ADMIN_PIN 設的一樣。只存在這支裝置上，不會上傳；跟「通知信箱」那組共用，填過一邊另一邊就會帶入</div>
+      <input class="f-in" id="bkPin" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="你設的管理密碼">
+      <button class="qbtn" id="bkPinEye" type="button" style="margin-top:8px">顯示密碼</button></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
       <button class="qbtn" id="bkNow">立即備份</button>
       <button class="qbtn" id="bkReload">重新讀取清單</button>
@@ -3558,7 +3559,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.32　2026/10/18';
+var APP_VERSION='v11.33　2026/10/18';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -10671,12 +10672,14 @@ document.addEventListener('click',function(e){
 var BK={list:[],busy:false,asked:false};
 var BK_REASON={auto:'自動',save:'儲存前',manual:'手動',restore:'還原前'};
 function bkEp(){return String((($('#bkEndpoint')||{}).value)||((SITE.backup||{}).endpoint)||'').trim()}
-function bkPin(){var p=String((($('#bkPin')||{}).value)||'').trim();if(!p)p=String((($('#edPin')||{}).value)||'').trim();if(!p){try{p=localStorage.getItem('mailPin')||''}catch(e){}}return p}
+function bkNorm(x){x=String(x==null?'':x);try{x=x.normalize('NFKC')}catch(e){}return x.trim()}
+function bkPin(){var p=bkNorm((($('#bkPin')||{}).value));if(!p)p=bkNorm((($('#edPin')||{}).value));if(!p){try{p=bkNorm(localStorage.getItem('mailPin')||'')}catch(e){}}return p}
 (function(){
   var b=$('#bkPin'),e=$('#edPin');if(!b)return;
   try{var sp=localStorage.getItem('mailPin');if(sp&&!b.value)b.value=sp;}catch(x){}
   function keep(){var v=b.value.trim();if(!v)return;try{localStorage.setItem('mailPin',v)}catch(x){}if(e&&!e.value)e.value=v;}
   b.addEventListener('input',keep);b.addEventListener('change',keep);
+  var eye=$('#bkPinEye');if(eye)eye.addEventListener('click',function(){var on=b.type==='password';b.type=on?'text':'password';eye.textContent=on?'隱藏密碼':'顯示密碼';});
   if(e)e.addEventListener('input',function(){if(!b.value&&e.value)b.value=e.value;});
 })();
 function bkMissing(){var e=bkEp();return !e?'還沒填備份服務網址':e.indexOf('/exec')<0?'網址結尾要是 /exec':'還沒填管理密碼（網址下面那一格）'}
@@ -10695,6 +10698,16 @@ async function bkCall(payload){
   if(!j.ok){
     var er=j.error||'失敗';
     if(/ADMIN_PIN 還沒改/.test(er))er='備份 Apps Script 裡的密碼還是預設文字，請改成你的管理密碼並重新部署新版本';
+    else if(/管理密碼不對/.test(er)){
+      var why='';
+      try{
+        var g=await (await fetch(ep)).json();
+        if(!g||g.version==null)why='這個網址對應的 Apps Script 是舊版（或改完密碼後沒有「部署新版本」）。請貼上最新的備份程式碼、改好 ADMIN_PIN，再到「部署 → 管理部署作業 → 編輯 → 版本選新版本」。';
+        else if(g.pinSet===false)why='Apps Script 的 ADMIN_PIN 還是預設文字。';
+        else why='Apps Script 是新版，但密碼不一致。';
+      }catch(x){why='';}
+      er='管理密碼不對。這邊送出的是 '+pin.length+' 個字元。'+(why||'請按「顯示密碼」確認有沒有打錯，並確認 Apps Script 的 ADMIN_PIN 一樣。');
+    }
     throw new Error(er);
   }
   return j;
