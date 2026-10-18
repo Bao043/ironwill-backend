@@ -1396,6 +1396,9 @@ body.editing .wrap{padding-bottom:140px}
 .code-in::placeholder{color:var(--line)}
 .code-bad{color:var(--signal);font-size:calc(12.5px*var(--fs));margin-top:10px;display:none}
 .code-bad.on{display:block}
+.code-why{margin-top:16px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:calc(13px*var(--fs));line-height:1.75;color:var(--ink-soft)}
+.code-why b{color:var(--ink)}
+.code-why p{margin:6px 0 0}
 
 /* article */
 .art p{font-size:calc(16px*var(--fs));line-height:2.05;margin:0 0 20px}
@@ -2644,10 +2647,17 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
       <div class="meta">上課代號</div>
       <h1 class="display" style="font-size:calc(24px*var(--fs));margin-top:8px" data-txt="codeTitle">先輸入今天的代號</h1>
       <p class="sub" style="margin-top:10px">代號請看講師的投影或白板。</p>
+      <div class="code-why">
+        <b>什麼是「上課代號」？</b>
+        <p>「上課專區」是給來上課的學員用的：課前課後測驗、課程回饋、看自己的成績，都在裡面。</p>
+        <p>代號是 4 位數字，由講師在<b>課堂現場</b>的投影或白板上公布，用來確認你有參加這堂課。每堂課的代號不一樣，輸入一次之後，這堂課就不用再輸入。</p>
+        <p>如果你是從分享連結點進來、並沒有來上課，這一區暫時用不到，歡迎回首頁看看其他內容。</p>
+      </div>
       <input class="code-in" id="codeIn" inputmode="numeric" maxlength="4" placeholder="0000">
       <div class="code-bad" id="codeBad">代號不對。講師會寫在白板上，或直接問一下。</div>
       <button class="btn" id="codeOk">確認</button>
       <button class="btn btn-quiet" id="codeExp" data-go="p-explain">我只想看題目詳解</button>
+      <button class="btn btn-quiet" id="codeHome" data-go="p-home">我不是來上課的，回首頁</button>
       <p class="note" hidden></p>
     </div>
   </section>
@@ -3254,8 +3264,11 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
   <div class="grp-b">
     <p class="sub">把課程、講師介紹、題庫、文章備份到你的 Google 雲端硬碟（資料夾「IRONWILL_備份」）。你登入後台時如果距離上一份超過 24 小時就會自動備份，每次「儲存」之前也會先備份一份舊的。萬一內容被改壞，挑一份按「還原」就能回到那個時間點。邀約、悄悄話、作答紀錄不在還原範圍，也不會被動到。</p>
     <div class="f" style="padding-top:8px"><div class="f-q">備份服務網址</div>
-      <div class="f-hint">備份專用的 Apps Script 網址（跟寄信那支分開）。管理密碼沿用「通知信箱」裡填的那個，兩支 Apps Script 請設成同一組</div>
+      <div class="f-hint">備份專用的 Apps Script 網址（跟寄信那支分開），結尾是 /exec</div>
       <input class="f-in" id="bkEndpoint" placeholder="https://script.google.com/macros/s/…/exec"></div>
+    <div class="f"><div class="f-q">管理密碼</div>
+      <div class="f-hint">跟備份 Apps Script 第 18 行 ADMIN_PIN 設的一樣。只存在這支裝置上，不會上傳；跟「通知信箱」那組共用，填過一邊另一邊就會帶入</div>
+      <input class="f-in" id="bkPin" type="password" autocomplete="off" placeholder="你設的管理密碼"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
       <button class="qbtn" id="bkNow">立即備份</button>
       <button class="qbtn" id="bkReload">重新讀取清單</button>
@@ -3545,7 +3558,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.31　2026/10/18';
+var APP_VERSION='v11.32　2026/10/18';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -3720,7 +3733,7 @@ function show(id,isBack){
 }
 var HITMAP={'p-files':'files','p-about':'about','p-quiz':'quiz','p-feedback':'feedback','p-invite':'invite',
             'p-disaster':'disaster','p-firstaid':'firstaid','p-whisper':'whisper','p-challenge':'challenge'};
-function go(id){
+function go(id){ if(id==='p-quiz'&&!EDITING&&!hasPassed()){pending='p-quiz';try{$('#codeIn').value='';$('#codeBad').classList.remove('on')}catch(e){}id='p-code';}
   if(id!==stack[stack.length-1]){stack.push(id);}
   show(id,false);
   if(id==='p-name'||id==='p-profile')prefillName();
@@ -8741,7 +8754,7 @@ $('#codeOk').addEventListener('click',function(){
     try{localStorage.setItem(passKey(),CODE)}catch(e){}
     countEntered();
     $('#codeBad').classList.remove('on');
-    var dest=pending||'p-run';
+    var dest=pending||'p-run';if(stack[stack.length-1]==='p-code')stack.pop();
     if(dest==='p-run')dest=profileName?'p-name':'p-profile';
     go(dest);
   }else{$('#codeBad').classList.add('on');}
@@ -10658,14 +10671,22 @@ document.addEventListener('click',function(e){
 var BK={list:[],busy:false,asked:false};
 var BK_REASON={auto:'自動',save:'儲存前',manual:'手動',restore:'還原前'};
 function bkEp(){return String((($('#bkEndpoint')||{}).value)||((SITE.backup||{}).endpoint)||'').trim()}
-function bkPin(){var p=String((($('#edPin')||{}).value)||'').trim();if(!p){try{p=localStorage.getItem('mailPin')||''}catch(e){}}return p}
+function bkPin(){var p=String((($('#bkPin')||{}).value)||'').trim();if(!p)p=String((($('#edPin')||{}).value)||'').trim();if(!p){try{p=localStorage.getItem('mailPin')||''}catch(e){}}return p}
+(function(){
+  var b=$('#bkPin'),e=$('#edPin');if(!b)return;
+  try{var sp=localStorage.getItem('mailPin');if(sp&&!b.value)b.value=sp;}catch(x){}
+  function keep(){var v=b.value.trim();if(!v)return;try{localStorage.setItem('mailPin',v)}catch(x){}if(e&&!e.value)e.value=v;}
+  b.addEventListener('input',keep);b.addEventListener('change',keep);
+  if(e)e.addEventListener('input',function(){if(!b.value&&e.value)b.value=e.value;});
+})();
+function bkMissing(){var e=bkEp();return !e?'還沒填備份服務網址':e.indexOf('/exec')<0?'網址結尾要是 /exec':'還沒填管理密碼（網址下面那一格）'}
 function bkReady(){var e=bkEp();return !!(e&&e.indexOf('/exec')>0&&bkPin())}
 function bkMsg(t,bad){var m=$('#bkMsg');if(m){m.textContent=t||'';m.style.color=bad?'var(--signal)':''}}
 async function bkCall(payload){
   var ep=bkEp(),pin=bkPin();
   if(!ep)throw new Error('還沒填備份服務網址');
   if(ep.indexOf('/exec')<0)throw new Error('網址結尾要是 /exec');
-  if(!pin)throw new Error('還沒填管理密碼（在「通知信箱」那組）');
+  if(!pin)throw new Error('還沒填管理密碼（就在備份服務網址的下面）');
   var r;
   try{r=await fetch(ep,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({pin:pin},payload))});}
   catch(e){throw new Error('連不到備份服務。部署時「具有存取權的使用者」要選「任何人」')}
@@ -10713,7 +10734,7 @@ function bkPaint(){
 }
 async function bkLoad(quiet){
   if(BK.busy)return;
-  if(!bkReady()){if(!quiet)bkMsg('請先填好備份服務網址與管理密碼',true);return;}
+  if(!bkReady()){if(!quiet)bkMsg(bkMissing(),true);return;}
   BK.busy=true;if(!quiet)bkMsg('讀取中…');
   try{var j=await bkCall({action:'backupList'});BK.list=j.list||[];bkPaint();if(!quiet)bkMsg('已讀取，共 '+BK.list.length+' 份');}
   catch(e){if(!quiet)bkMsg(e.message,true);else console.warn('備份清單',e.message)}
@@ -10777,7 +10798,7 @@ document.addEventListener('click',async function(e){
   if(e.target.closest('#bkReload')){bkLoad(false);return;}
   if(e.target.closest('#bkNow')){
     if(BK.busy)return;
-    if(!bkReady()){bkMsg('請先填好備份服務網址與管理密碼',true);return;}
+    if(!bkReady()){bkMsg(bkMissing(),true);return;}
     BK.busy=true;bkMsg('備份中…');
     try{await bkDo('manual');BK.busy=false;await bkLoad(true);bkMsg('已備份');toast('已備份');}
     catch(err){BK.busy=false;bkMsg(err.code||err.message,true);}
