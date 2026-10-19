@@ -933,6 +933,25 @@ body.dirty #z-pro{padding-bottom:80px}
 .fl-t{font-size:calc(15px*var(--fs));line-height:1.5;overflow-wrap:anywhere}
 .fl-d{font-size:calc(12.5px*var(--fs));color:var(--muted);margin-top:2px}
 .fl-go{font-size:calc(13px*var(--fs));color:var(--muted);flex:none}
+#fileList .fl{padding:12px 14px;gap:12px;margin-top:8px}
+#fileList .fl-m{width:40px;height:40px;border-radius:10px;font-weight:600}
+#fileList .fl-t{font-size:calc(14.5px*var(--fs));line-height:1.45}
+.fl-pdf .fl-m{color:var(--signal);border-color:var(--signal);background:var(--signal-soft)}
+.fl-ppt .fl-m{color:#D98A2B;border-color:#D98A2B;background:rgba(217,138,43,.12)}
+.fl-doc .fl-m{color:#4F86C6;border-color:#4F86C6;background:rgba(79,134,198,.12)}
+.fl-xls .fl-m{color:var(--ok);border-color:var(--ok);background:rgba(80,140,110,.12)}
+.fl-img .fl-m{color:#8A6FBF;border-color:#8A6FBF;background:rgba(138,111,191,.12)}
+.fl-vid .fl-m{color:#C4569B;border-color:#C4569B;background:rgba(196,86,155,.12)}
+.fl-new{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:99px;background:var(--signal);color:#fff;font-size:calc(10px*var(--fs));letter-spacing:.06em;vertical-align:middle}
+.fl-lock{display:inline-block;color:var(--ink-soft);font-size:calc(12px*var(--fs))}
+.fl-lock.on{color:var(--ok)}
+.fg-h{display:flex;align-items:center;gap:10px;margin-top:26px;padding:0 2px 8px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.fg:first-child .fg-h{margin-top:14px}
+.fg-t{font-weight:600;font-size:calc(14px*var(--fs));letter-spacing:.04em}
+.fg-n{font-family:var(--mono);font-size:calc(11px*var(--fs));color:var(--muted)}
+.fg-c{margin-left:auto;color:var(--muted);transition:transform .2s ease}
+.fg-h:not(.off) .fg-c{transform:rotate(90deg)}
+.code-ctx{margin-top:14px;padding:12px 14px;border:1px solid var(--signal);border-radius:12px;background:var(--signal-soft);font-size:calc(13.5px*var(--fs));line-height:1.7}
 
 /* 授課範圍：五大類 */
 .scope{margin-top:10px;border-top:1px solid var(--line)}
@@ -2647,6 +2666,7 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
       <div class="meta">上課代號</div>
       <h1 class="display" style="font-size:calc(24px*var(--fs));margin-top:8px" data-txt="codeTitle">先輸入今天的代號</h1>
       <p class="sub" style="margin-top:10px">代號請看講師的投影或白板。</p>
+      <div class="code-ctx" id="codeCtx" style="display:none"></div>
       <div class="code-why">
         <b>什麼是「上課代號」？</b>
         <p>「上課專區」是給來上課的學員用的：課前課後測驗、課程回饋、看自己的成績，都在裡面。</p>
@@ -3559,7 +3579,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.33　2026/10/18';
+var APP_VERSION='v11.35　2026/10/19';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -3734,7 +3754,7 @@ function show(id,isBack){
 }
 var HITMAP={'p-files':'files','p-about':'about','p-quiz':'quiz','p-feedback':'feedback','p-invite':'invite',
             'p-disaster':'disaster','p-firstaid':'firstaid','p-whisper':'whisper','p-challenge':'challenge'};
-function go(id){ if(id==='p-quiz'&&!EDITING&&!hasPassed()){pending='p-quiz';try{$('#codeIn').value='';$('#codeBad').classList.remove('on')}catch(e){}id='p-code';}
+function go(id){ if(id==='p-quiz'&&!EDITING&&!hasPassed()){pending='p-quiz';codeCtxSet('');try{$('#codeIn').value='';$('#codeBad').classList.remove('on')}catch(e){}id='p-code';}
   if(id!==stack[stack.length-1]){stack.push(id);}
   show(id,false);
   if(id==='p-name'||id==='p-profile')prefillName();
@@ -5004,7 +5024,7 @@ function artSorted(list){   // 置頂的在最上面（最近置頂的最前）�
     return artTime(b)-artTime(a);
   });
 }
-function artsOf(cat){return artSorted(ARTICLES.filter(function(a){return a.cat===cat}))}
+function artLive(a){return EDITING||artTime(a)<=Date.now()}function artSchedTxt(a){return (!EDITING&&artTime(a)>Date.now())?'　⏰ 預約，'+a.d+' 才會上架':''}function artsOf(cat){return artSorted(ARTICLES.filter(function(a){return a.cat===cat&&artLive(a)}))}
 function artMatch(a,q){
   if(!q)return true;q=q.toLowerCase();
   return [a.t,a.c,(a.b||[]).join(' ').replace(/<[^>]+>/g,'')].join(' ').toLowerCase().indexOf(q)>=0;
@@ -5051,7 +5071,7 @@ function buildList(key,el,keepSearch){
 function showV(){return !(SITE&&SITE.showViews===false)}
 function artViews(a){return (HITS||{})['art_'+a.id]||0}
 function openArt(id){
-  var a=ARTICLES.filter(function(x){return x.id===id})[0];if(!a)return;
+  var a=ARTICLES.filter(function(x){return x.id===id})[0];if(!a||!artLive(a))return;
   countHit('art_'+a.id);
   $('#artMeta').textContent=a.c+'　'+a.d+(showV()?'　👁 '+artViews(a).toLocaleString():'');
   $('#artTitle').textContent=a.t;
@@ -5991,7 +6011,7 @@ function fileKind(n){
   var m=String(n||'').toLowerCase().match(/\.([a-z0-9]{2,5})$/);
   return m?m[1].toUpperCase().slice(0,4):'檔';
 }
-function renderFiles(){
+function renderFilesOld(){
   var box=$('#fileList');if(!box)return;
   var list=(SITE.files.items||[]).filter(function(f){return EDITING||!f.hidden});
   if(!list.length){
@@ -6017,7 +6037,7 @@ document.addEventListener('click',function(e){
   }
   var f=e.target.closest('[data-file]');if(!f||EDITING)return;
   var it=(SITE.files.items||[]).filter(function(x){return x.id===f.dataset.file})[0]||{id:f.dataset.file,name:''};
-  openFileView(it);countHit('files');
+  fileOpenGuard(it);
 });
 /* 檔案：在 App 裡預覽，不跳去雲端硬碟 App．下載走 Apps Script，再用手機的分享選單存檔 */
 var FV={it:null,file:null,err:null,job:0};
@@ -7892,7 +7912,7 @@ function renderArtEdit(openId){
     var ymd=(function(){var m=String(a.d||'').match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/);return m?m[1]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[3]).slice(-2):''})();
     var el=document.createElement('div');el.className='qe'+(openId&&openId===a.id?' open':'');
     el.innerHTML='<div class="qe-h"><div class="qe-n">'+(a.cat==='disaster'?'防':'急')+'</div>'+
-      '<div class="qe-t">'+(a.t||'（新文章）')+'<div class="row-d" style="margin-top:2px">'+(a.d||'')+'</div></div>'+
+      '<div class="qe-t">'+(a.t||'（新文章）')+'<div class="row-d" style="margin-top:2px">'+(a.d||'')+artSchedTxt(a)+'</div></div>'+
       '<button class="art-pin'+(a.pinned?' on':'')+'" data-pin title="置頂">📌</button>'+
       '<div class="qe-x">👁 '+artViews(a)+'</div></div>'+
       '<div class="qe-b">'+
@@ -7902,7 +7922,7 @@ function renderArtEdit(openId){
       '<div class="chips" data-one data-cat><span class="chip'+(a.cat==='disaster'?' on':'')+'" data-c="disaster">防災知識專區</span>'+
       '<span class="chip'+(a.cat==='firstaid'?' on':'')+'" data-c="firstaid">急救教育專區</span></div></div>'+
       '<div class="f"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">發布日期</div>'+
-      '<div class="f-hint">沒置頂的文章照這個日期由新到舊排</div>'+
+      '<div class="f-hint">沒置頂的文章照這個日期由新到舊排。選未來的日期＝預約上架，那一天才會顯示給學員</div>'+
       '<input class="f-in" type="date" data-adate value="'+ymd+'"></div>'+
       '<div class="f"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">小分類</div>'+
       '<input class="f-in" data-ak="c" value="'+(a.c||'').replace(/"/g,'&quot;')+'" placeholder="例如：火災逃生"></div>'+
@@ -7925,7 +7945,7 @@ function renderArtEdit(openId){
     el.querySelector('[data-adate]').addEventListener('change',function(e){
       var v=e.target.value;if(!v)return;var p=v.split('-');
       a.d=p[0]+'/'+p[1]+'/'+p[2];a.ts=new Date(+p[0],+p[1]-1,+p[2]).getTime();
-      el.querySelector('.qe-t .row-d').textContent=a.d;setDirty(true);refreshArts();
+      el.querySelector('.qe-t .row-d').textContent=a.d+artSchedTxt(a);if(artTime(a)>Date.now())toast('預約上架：'+a.d+' 才會顯示給學員，記得按儲存文章');setDirty(true);refreshArts();
     });
     el.querySelectorAll('[data-ak]').forEach(function(f){
       f.addEventListener('input',function(){
@@ -8482,7 +8502,7 @@ function renderFilePick(){
         '<div class="fl-go">'+(on?'已加入':'加入')+'</div></div>';
     }).join('');
 }
-function renderFileEdit(){
+function renderFileEditOld(){
   var box=$('#fileEdit');if(!box)return;
   var list=SITE.files.items||[];
   $('#fileCount')&&($('#fileCount').textContent=list.length+' 個');
@@ -8745,7 +8765,7 @@ document.addEventListener('click',function(e){
     if(d==='p-run')d=profileName?'p-name':'p-profile';
     go(d);return;
   }
-  pending=t.dataset.gate;
+  pending=t.dataset.gate;codeCtxSet('');
   $('#codeIn').value='';$('#codeBad').classList.remove('on');
   go('p-code');
 });
@@ -8757,7 +8777,7 @@ $('#codeOk').addEventListener('click',function(){
     $('#codeBad').classList.remove('on');
     var dest=pending||'p-run';if(stack[stack.length-1]==='p-code')stack.pop();
     if(dest==='p-run')dest=profileName?'p-name':'p-profile';
-    go(dest);
+    go(dest);if(dest==='p-files')fileAfterCode();
   }else{$('#codeBad').classList.add('on');}
 });
 /* ---- 作答後學員看得到什麼 ---- */
@@ -9204,7 +9224,7 @@ function hmNiceBreak(t){
 }
 function hmFresh(ms){var n=Date.now();return !!ms&&n-ms<7*864e5&&ms<n+864e5}
 function hmLatest(cat){
-  var l=ARTICLES.filter(function(a){return a.cat===cat&&a.t});
+  var l=ARTICLES.filter(function(a){return a.cat===cat&&a.t&&artLive(a)});
   l.sort(function(a,b){return artTime(b)-artTime(a)});return l[0]||null;
 }
 function hmFiles(){return (typeof SITE!=='undefined'&&SITE&&SITE.files&&SITE.files.items||[]).filter(function(f){return !f.hidden})}
@@ -10864,6 +10884,131 @@ document.addEventListener('click',function(e){if(e.target.closest('#artShare'))a
     else if(tries>40)clearInterval(tm);
   },300);
 })();
+
+/* ===== v11.35 檔案下載：分類、搜尋、每個檔案可設「需要上課代碼」 ===== */
+var FILE_Q='',FILE_COLL={},FILE_PEND=null;
+function fileEsc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function fileCat(n){
+  var e=(String(n||'').toLowerCase().match(/\.([a-z0-9]{2,5})$/)||[])[1]||'';
+  if(e==='pdf')return 'pdf';
+  if(/^(ppt|pptx|key|odp)$/.test(e))return 'ppt';
+  if(/^(doc|docx|odt|txt|rtf|pages|md)$/.test(e))return 'doc';
+  if(/^(xls|xlsx|csv|ods|numbers)$/.test(e))return 'xls';
+  if(/^(jpe?g|png|gif|webp|heic|heif|bmp|svg)$/.test(e))return 'img';
+  if(/^(mp4|mov|m4v|avi|mkv|webm|mp3|m4a|wav)$/.test(e))return 'vid';
+  return 'oth';
+}
+function fileIsNew(f){return !!f.at&&Date.now()-f.at<7*864e5}
+function fileGroups(list){            // 依第一次出現的順序排；沒填分類的放最後
+  var order=[],map={};
+  list.forEach(function(f){var g=String(f.group||'').trim();if(!map[g]){map[g]=[];order.push(g)}map[g].push(f)});
+  var named=order.filter(function(g){return g});
+  return named.concat(order.indexOf('')>=0?['']:[]).map(function(g){return {name:g,items:map[g]}});
+}
+function fileRow(f){
+  var pass=hasPassed();
+  var d=[];
+  if(f.needCode)d.push('<span class="fl-lock'+(pass?' on':'')+'">'+(pass?'🔓 已解鎖':'🔒 需要上課代碼')+'</span>');
+  if(f.note)d.push(fileEsc(f.note));
+  return '<div class="fl fl-'+fileCat(f.name)+(f.hidden?' blk-off':'')+'" data-file="'+fileEsc(f.id)+'">'+
+    '<div class="fl-m">'+fileEsc(fileKind(f.name))+'</div>'+
+    '<div class="fl-b"><div class="fl-t">'+fileEsc(f.label||f.name)+(fileIsNew(f)?'<span class="fl-new">新</span>':'')+'</div>'+
+    (d.length?'<div class="fl-d">'+d.join('　')+'</div>':'')+'</div>'+
+    '<div class="fl-go">開啟 →</div></div>';
+}
+function renderFiles(){
+  var box=$('#fileList');if(!box)return;
+  var all=(SITE.files.items||[]).filter(function(f){return EDITING||!f.hidden});
+  if(!box.querySelector('#fileRows')){
+    box.innerHTML='<input class="f-in art-search" id="fileSearch" type="search" placeholder="搜尋檔案" style="display:none"><div id="fileRows"></div>';
+    box.querySelector('#fileSearch').addEventListener('input',function(e){FILE_Q=e.target.value.trim();renderFiles();});
+  }
+  var sb=box.querySelector('#fileSearch'),rows=box.querySelector('#fileRows');
+  sb.style.display=all.length>=8?'':'none';
+  if(all.length<8)FILE_Q='';
+  if(!all.length){
+    rows.innerHTML='<div class="empty">'+(EDITING?'還沒有檔案．到後台「檔案下載」讀取資料夾後挑選':'目前沒有可以下載的檔案。')+'</div>';
+    return;
+  }
+  var q=FILE_Q.toLowerCase();
+  var list=q?all.filter(function(f){return [f.label,f.name,f.note,f.group].join(' ').toLowerCase().indexOf(q)>=0}):all;
+  if(!list.length){rows.innerHTML='<div class="empty">找不到「'+fileEsc(FILE_Q)+'」相關的檔案。</div>';return;}
+  var gs=fileGroups(list),multi=gs.length>1||(gs.length===1&&!!gs[0].name);
+  rows.innerHTML=gs.map(function(g){
+    var key=g.name||'__none',off=!q&&!!FILE_COLL[key];
+    var head=multi?'<div class="fg-h'+(off?' off':'')+'" data-fgroup="'+fileEsc(key)+'"><span class="fg-t">'+fileEsc(g.name||'其他')+'</span><span class="fg-n">'+g.items.length+'</span><span class="fg-c">›</span></div>':'';
+    return '<div class="fg">'+head+(off?'':'<div class="fg-b">'+g.items.map(fileRow).join('')+'</div>')+'</div>';
+  }).join('');
+}
+document.addEventListener('click',function(e){
+  var h=e.target.closest('[data-fgroup]');if(!h)return;
+  var k=h.dataset.fgroup;FILE_COLL[k]=!FILE_COLL[k];renderFiles();
+});
+function codeCtxSet(t){
+  var c=$('#codeCtx');if(c){c.textContent=t||'';c.style.display=t?'':'none';}
+  if(!t)FILE_PEND=null;
+}
+function fileOpenGuard(it){
+  if(it.needCode&&!hasPassed()&&!EDITING){
+    FILE_PEND=it;pending='p-files';
+    try{$('#codeIn').value='';$('#codeBad').classList.remove('on')}catch(e){}
+    codeCtxSet('「'+String(it.label||it.name||'這個檔案')+'」是上課用的教材，輸入上課代號才能開啟和下載。');
+    FILE_PEND=it;
+    go('p-code');return;
+  }
+  openFileView(it);countHit('files');
+}
+function fileAfterCode(){
+  var it=FILE_PEND;FILE_PEND=null;codeCtxSet('');
+  try{renderFiles()}catch(e){}
+  if(it){openFileView(it);countHit('files');}
+}
+/* 後台：檔案清單編輯（加上分類、需要上課代碼） */
+function renderFileEdit(){
+  var box=$('#fileEdit');if(!box)return;
+  var list=SITE.files.items||[];
+  $('#fileCount')&&($('#fileCount').textContent=list.length+' 個');
+  $('#filesTag')&&($('#filesTag').textContent=list.filter(function(f){return !f.hidden}).length+' 個檔案'+(list.some(function(f){return f.needCode})?'．🔒 '+list.filter(function(f){return f.needCode}).length:''));
+  if(!list.length){box.innerHTML='<div class="empty">還沒有選檔案</div>';return;}
+  var groups=[];list.forEach(function(f){var g=String(f.group||'').trim();if(g&&groups.indexOf(g)<0)groups.push(g)});
+  var lab='font-size:calc(13px*var(--fs));color:var(--muted)';
+  box.innerHTML='<datalist id="fileGroupList">'+groups.map(function(g){return '<option value="'+fileEsc(g)+'">'}).join('')+'</datalist>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px"><button class="qbtn" data-fbulk="on">全部需要上課代碼</button><button class="qbtn" data-fbulk="off">全部不用代碼</button></div>'+
+    list.map(function(f,i){
+    return '<div class="qe open" data-fi="'+i+'"><div class="qe-h"><div class="qe-t">'+fileEsc(fileKind(f.name))+'　'+fileEsc(f.label||f.name)+'</div>'+
+      '<div class="qe-x">'+(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'')+'</div></div>'+
+      '<div class="f"><div class="f-q" style="'+lab+'">顯示名稱</div>'+
+      '<input class="f-in" data-fk="label" value="'+fileEsc(f.label||f.name)+'"></div>'+
+      '<div class="f"><div class="f-q" style="'+lab+'">分類（可留空）</div>'+
+      '<div class="f-hint">檔案多的時候，同一個分類會收在一起，例如「第一堂」「講義」「表單」。打一樣的字就會歸同一類</div>'+
+      '<input class="f-in" data-fk="group" list="fileGroupList" value="'+fileEsc(f.group||'')+'" placeholder="例如：CPR 課程"></div>'+
+      '<div class="f"><div class="f-q" style="'+lab+'">說明（可留空）</div>'+
+      '<input class="f-in" data-fk="note" value="'+fileEsc(f.note||'')+'" placeholder="例如：上課前先看這份"></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:6px"><span class="startog'+(f.needCode?' on':'')+'" data-fneed>需要輸入上課代碼才能開啟</span></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:12px;margin-top:8px">'+
+      '<button class="qbtn" data-fa="up">↑ 上移</button><button class="qbtn" data-fa="dn">↓ 下移</button>'+
+      '<button class="qbtn" data-fa="hide">'+(f.hidden?'顯示':'隱藏')+'</button>'+
+      '<button class="qbtn" data-fa="del">移除</button></div></div>';
+  }).join('');
+}
+document.addEventListener('click',function(e){
+  var L=(SITE.files&&SITE.files.items)||[],box=$('#fileEdit');if(!box)return;
+  var t=e.target.closest('[data-fneed]');
+  if(t){
+    var b=t.closest('[data-fi]');if(!b)return;
+    var f=L[+b.dataset.fi];if(!f)return;
+    f.needCode=!f.needCode;t.classList.toggle('on',!!f.needCode);
+    var x=b.querySelector('.qe-x');if(x)x.textContent=(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'');
+    setDirty(true);try{renderFiles()}catch(err){}return;
+  }
+  var bk=e.target.closest('[data-fbulk]');
+  if(bk){
+    var on=bk.dataset.fbulk==='on';
+    if(on&&!confirm('把全部 '+L.length+' 個檔案都設成「需要上課代碼」？'))return;
+    L.forEach(function(f){f.needCode=on});
+    setDirty(true);renderFileEdit();try{renderFiles()}catch(err){}
+  }
+});
 
 /* v11.31 即時同步保險：分頁回到前景／網路恢復時重接監聽，拿一次最新的課程設定（後台開關漏接的主因：手機/分頁休眠後連線斷了） */
 (function(){
