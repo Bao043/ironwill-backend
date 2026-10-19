@@ -1592,6 +1592,16 @@ body{font-size:calc(clamp(14.5px,1.2vw + 10px,16px)*var(--fs))}
 .atab{display:none}
 .atab.is-on{display:block;animation:gin .25s cubic-bezier(.22,.61,.36,1)}
 @media (prefers-reduced-motion:reduce){.atab.is-on{animation:none}}
+.td-subnav{display:flex;gap:0;margin:16px 0 4px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.td-subnav button{flex:1;appearance:none;background:transparent;border:0;border-right:1px solid var(--line);color:var(--muted);font:inherit;font-size:calc(14px*var(--fs));padding:11px 4px;cursor:pointer;transition:background .15s,color .15s}
+.td-subnav button:last-child{border-right:0}
+.td-subnav button.on{background:var(--ink);color:var(--paper);font-weight:600}
+#at-today[data-tdv="live"] [data-tds]:not([data-tds~="live"]),
+#at-today[data-tdv="result"] [data-tds]:not([data-tds~="result"]),
+#at-today[data-tdv="proj"] [data-tds]:not([data-tds~="proj"]),
+#at-today[data-tdv="fb"] [data-tds]:not([data-tds~="fb"]){display:none!important}
+#at-today:not([data-tdv="live"]) .td-col:first-child{display:none}
+#at-today:not([data-tdv="live"]) .td-grid{display:block}
 .at-head{padding:22px 0 2px}
 .at-head .display{font-size:calc(24px*var(--fs));margin-top:4px;line-height:1.4}
 .at-head .meta{color:var(--signal);letter-spacing:.18em}
@@ -1719,7 +1729,7 @@ body.dirty .undo-bar{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
   .undo-bar{bottom:24px}
   body.dirty .undo-bar{bottom:84px}
   .td-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start}
-  #at-today .td-col:last-child{padding-top:84px}
+  #at-today .td-col:last-child{padding-top:0}
   .td-c{font-size:calc(52px*var(--fs))}
 }
 
@@ -2308,6 +2318,8 @@ html.wm-off #zv.wm .zv-stage::after{display:none}
   #listDisaster,#listFirstaid,#fileList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:44px;align-items:start}
   #listDisaster>.course-more,#listDisaster>.empty,#listFirstaid>.course-more,#listFirstaid>.empty,#fileList>.empty{grid-column:1/-1}
   #fileList{column-gap:18px}
+  #fileList{display:block}
+  #fileList .fg-b{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;align-items:stretch}
   #abContacts.cts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
   #abContacts .ct-v{overflow-wrap:break-word;word-break:keep-all}
   .lead{max-width:none}
@@ -2955,16 +2967,19 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     <button type="button" class="atb" data-atab="bank"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.6h10v15.8H7z"/><path d="m9.5 12 2 2 3.5-4"/></svg><span>題庫</span></button><button type="button" class="atb" data-atab="content"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4 8 4-8 4-8-4z"/><path d="m4 12 8 4 8-4"/><path d="m4 16 8 4 8-4"/></svg><span>內容</span></button><button type="button" class="atb" data-atab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>設定</span></button>
   </aside>
   <div class="adm-main">
-  <section class="atab is-on" id="at-today" data-tab="today">
+  <section class="atab is-on" id="at-today" data-tab="today" data-tdv="live">
+  <div class="at-head"><div class="meta" id="proMeta">進行中</div>
+    <h1 class="display" id="proTitle">課程</h1></div>
+  <div class="td-subnav" role="tablist" aria-label="課程分頁">
+    <button type="button" class="on" data-tdsub="live">上課</button><button type="button" data-tdsub="result">成績</button><button type="button" data-tdsub="proj">投影</button><button type="button" data-tdsub="fb">回饋</button>
+  </div>
   <div class="td-grid"><div class="td-col">
-    <div class="at-head"><div class="meta" id="proMeta">進行中</div>
-      <h1 class="display" id="proTitle">課程</h1></div>
-    <div class="td-code">
+    <div class="td-code" data-tds="live">
       <div class="td-code-b"><div class="td-l">本堂代號</div><div class="td-c" id="codeShow">8236</div></div>
       <button class="qbtn" id="regenCode">換一組</button>
     </div>
-    <div class="td-acts"><button type="button" class="qbtn" id="tdQR">全螢幕 QR</button><button type="button" class="qbtn" id="tdShare">連結與 QR</button></div>
-    <div class="td-share" id="pnl-share" hidden>
+    <div class="td-acts" data-tds="live"><button type="button" class="qbtn" id="tdQR">全螢幕 QR</button><button type="button" class="qbtn" id="tdShare">連結與 QR</button></div>
+    <div class="td-share" id="pnl-share" data-tds="live" hidden>
     <p class="sub">投影或列印這個 QR，學員掃了直接進課程頁，看不到任何管理功能。</p>
     <div class="qrbox"><div id="qrWrap2"></div></div>
     <div class="linkrow"><span id="stuLink2"></span></div>
@@ -2974,15 +2989,15 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     </div>
   
     </div>
-    <div class="stats td-kpi">
+    <div class="stats td-kpi" data-tds="live">
       <div class="stat"><div class="stat-n" id="kpiPpl">—</div><div class="stat-l">輸入代號</div></div>
       <div class="stat"><div class="stat-n" id="kpiPre">—</div><div class="stat-l">課前交卷</div></div>
       <div class="stat"><div class="stat-n" id="kpiPost">—</div><div class="stat-l">課後交卷</div></div>
     </div>
-    <div class="td-next" id="tdNext" hidden></div>
+    <div class="td-next" id="tdNext" data-tds="live" hidden></div>
 
-    <div class="td-h"><h2>測驗</h2><span>按了立刻生效</span></div>
-    <div class="td-box td-instant">
+    <div class="td-h" data-tds="live"><h2>測驗</h2><span>按了立刻生效</span></div>
+    <div class="td-box td-instant" data-tds="live">
       <div class="toggle-row"><span>課前測驗<em class="tr-d">學員看得到「課前測驗」入口</em></span><span class="td-st" data-st="qvPre"></span><span class="sw on" id="qvPre" role="switch" aria-checked="true" tabindex="0"></span></div>
       <div class="toggle-row"><span>課後測驗<em class="tr-d">講完再打開</em></span><span class="td-st" data-st="qvPost"></span><span class="sw on" id="qvPost" role="switch" aria-checked="true" tabindex="0"></span></div>
       <div class="td-lv"><div class="td-lv-t">作答結果公布到哪裡<span>課前、課後共用</span></div>
@@ -2992,22 +3007,22 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
       <div class="hint" id="qvLevelNote"></div></div>
     </div>
 
-    <div class="td-h"><h2>下課</h2><span>按了立刻生效</span></div>
-    <div class="td-box td-instant">
+    <div class="td-h" data-tds="live"><h2>下課</h2><span>按了立刻生效</span></div>
+    <div class="td-box td-instant" data-tds="live">
       <div class="toggle-row"><span>課程回饋入口<em class="tr-d">打開後學員畫面幾秒內出現入口；關掉就填不了</em></span><span class="td-st" data-st="qvFb"></span><span class="sw on" id="qvFb" role="switch" aria-checked="true" tabindex="0"></span></div>
     </div>
   </div><div class="td-col">
-    <div class="td-h"><h2>其他</h2><span>點進去處理</span></div>
-    <div class="td-box">
+    <div class="td-h" data-tds="live"><h2>其他</h2><span>點進去處理</span></div>
+    <div class="td-box" data-tds="live">
       <div class="td-row" data-atab-go="inbox"><span class="td-rt">收件匣<em id="tdInboxD">悄悄話 <b id="kpiW" data-jump="w">—</b>．待回邀約 <b id="kpiInv" data-jump="i">—</b></em></span><span class="td-pill" id="tdInboxPill" hidden></span><span id="inboxCount" hidden></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="bank:challenge"><span class="td-rt">挑戰題庫<em id="tdChD">—</em></span><span class="td-pill" id="tdChPill" hidden></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="settings:grp-traffic"><span class="td-rt">瀏覽流量<em>各頁真實點閱次數</em></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="content:grp-home"><span class="td-rt">學員首頁<em>功能磁磚開關、品牌圖、編輯學員畫面</em></span><span class="td-go">›</span></div>
     </div>
 
-    <div class="td-h" id="tdSessH"><h2>成績與回饋</h2><span id="fbTag"></span></div>
-    <p class="sub td-sub">投影、前三名、姓名顯示、回饋內容都在這裡，即時更新。每換一次代號就是新的一堂，保留最近 8 堂。</p>
-    <div class="chips" id="sessPick"></div>
+    <div class="td-h" id="tdSessH" data-tds="result proj fb"><h2>這一堂</h2><span id="fbTag"></span></div>
+    <p class="sub td-sub" data-tds="result">即時更新。每換一次代號就是新的一堂，保留最近 8 堂。</p>
+    <div class="chips" id="sessPick" data-tds="result proj fb"></div>
     <div id="sessBody"><div class="empty">登入後載入。</div></div>
   </div></div>
   </section>
@@ -3579,7 +3594,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.35　2026/10/19';
+var APP_VERSION='v11.37　2026/10/19';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -10975,8 +10990,8 @@ function renderFileEdit(){
   box.innerHTML='<datalist id="fileGroupList">'+groups.map(function(g){return '<option value="'+fileEsc(g)+'">'}).join('')+'</datalist>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px"><button class="qbtn" data-fbulk="on">全部需要上課代碼</button><button class="qbtn" data-fbulk="off">全部不用代碼</button></div>'+
     list.map(function(f,i){
-    return '<div class="qe open" data-fi="'+i+'"><div class="qe-h"><div class="qe-t">'+fileEsc(fileKind(f.name))+'　'+fileEsc(f.label||f.name)+'</div>'+
-      '<div class="qe-x">'+(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'')+'</div></div>'+
+    return '<div class="qe'+(FILE_OPEN[f.id]?' open':'')+'" data-fi="'+i+'"><div class="qe-h"><div class="qe-t">'+fileEsc(fileKind(f.name))+'　'+fileEsc(f.label||f.name)+(f.group?'<div class="row-d" style="margin-top:2px">'+fileEsc(f.group)+'</div>':'')+'</div>'+
+      '<div class="qe-x">'+(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'')+'</div></div><div class="qe-b">'+
       '<div class="f"><div class="f-q" style="'+lab+'">顯示名稱</div>'+
       '<input class="f-in" data-fk="label" value="'+fileEsc(f.label||f.name)+'"></div>'+
       '<div class="f"><div class="f-q" style="'+lab+'">分類（可留空）</div>'+
@@ -10988,7 +11003,7 @@ function renderFileEdit(){
       '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:12px;margin-top:8px">'+
       '<button class="qbtn" data-fa="up">↑ 上移</button><button class="qbtn" data-fa="dn">↓ 下移</button>'+
       '<button class="qbtn" data-fa="hide">'+(f.hidden?'顯示':'隱藏')+'</button>'+
-      '<button class="qbtn" data-fa="del">移除</button></div></div>';
+      '<button class="qbtn" data-fa="del">移除</button></div></div></div>';
   }).join('');
 }
 document.addEventListener('click',function(e){
@@ -11008,6 +11023,47 @@ document.addEventListener('click',function(e){
     L.forEach(function(f){f.needCode=on});
     setDirty(true);renderFileEdit();try{renderFiles()}catch(err){}
   }
+});
+
+/* ===== v11.36 課程頁分成四個小分頁：上課／成績／投影／回饋 ===== */
+var TD_MAP={'測驗':'result','上課投影':'proj','課前前三名':'proj','課後前三名':'proj','回饋':'fb','下載':'result'};
+function tdSubTag(){
+  var box=$('#sessBody');if(!box)return;
+  var cur='result';
+  Array.prototype.forEach.call(box.children,function(el){
+    if(el.classList.contains('section-head')){
+      var h=el.querySelector('h2'),t=h?h.textContent.trim():'';
+      if(TD_MAP[t])cur=TD_MAP[t];else if(/預估 vs 實際/.test(t))cur='result';
+    }
+    el.setAttribute('data-tds',cur);
+  });
+}
+function tdSubSet(k){
+  var at=$('#at-today');if(!at)return;
+  at.setAttribute('data-tdv',k);
+  $$('#at-today [data-tdsub]').forEach(function(b){b.classList.toggle('on',b.dataset.tdsub===k)});
+  try{sessionStorage.setItem('tdsub',k)}catch(e){}
+}
+(function(){
+  var box=$('#sessBody');if(!box||!$('#at-today'))return;
+  tdSubTag();
+  try{new MutationObserver(tdSubTag).observe(box,{childList:true})}catch(e){}
+  var k='live';try{k=sessionStorage.getItem('tdsub')||'live'}catch(e){}
+  if(!/^(live|result|proj|fb)$/.test(k))k='live';
+  tdSubSet(k);
+})();
+document.addEventListener('click',function(e){
+  if(!$('#at-today'))return;
+  var b=e.target.closest('[data-tdsub]');if(!b)return;
+  tdSubSet(b.dataset.tdsub);window.scrollTo({top:0,behavior:'instant'});
+});
+/* 後台檔案清單：預設收合，點標題才展開 */
+var FILE_OPEN={};
+document.addEventListener('click',function(e){
+  var h=e.target.closest('#fileEdit .qe-h');if(!h)return;
+  var q=h.closest('[data-fi]');if(!q)return;
+  var f=((SITE.files&&SITE.files.items)||[])[+q.dataset.fi];if(!f)return;
+  var on=q.classList.toggle('open');FILE_OPEN[f.id]=on;
 });
 
 /* v11.31 即時同步保險：分頁回到前景／網路恢復時重接監聽，拿一次最新的課程設定（後台開關漏接的主因：手機/分頁休眠後連線斷了） */
