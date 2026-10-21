@@ -3594,7 +3594,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.37　2026/10/19';
+var APP_VERSION='v11.38　2026/10/20';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -6088,7 +6088,7 @@ function fvPaint(){
   else{b.textContent='準備中…';b.disabled=true;}
 }
 function fvDownload(){
-  var it=FV.it;if(!it)return;
+  var it=FV.it;if(!it)return;try{countHit('fdl_'+it.id)}catch(e){}
   if(FV.file){
     var f=FV.file;
     if(fvTouch()&&navigator.canShare&&navigator.canShare({files:[f]})){
@@ -6858,17 +6858,17 @@ var HITS={};
 var METRIC_ERR='';
 function countHit(key){
   if(EDITING)return;
-  HITS[key]=(HITS[key]||0)+1;
+  HITS[key]=(HITS[key]||0)+1;hitDayLocal(key);
   if(PREVIEW||!window.fb)return;
   var F=window.fb;
-  var patch={};patch[key]=F.increment(1);
+  var patch={};patch[key]=F.increment(1);hitDay(patch,key);
   F.setDoc(F.doc(F.db,'questionStats',F.COURSE+'__views'),patch,{merge:true})
    .catch(function(e){METRIC_ERR=e.code||e.message;console.warn('計數失敗',e)});
 }
 var TKEYS=[['about','講師介紹'],['quiz','上課專區'],['feedback','課程回饋'],
            ['invite','課程邀約'],['disaster','防災知識專區'],['firstaid','急救教育專區'],
            ['whisper','傳聲悄悄話'],['challenge','挑戰題庫'],['video','影片播放'],['ig','IG 點擊']];
-function renderTraffic(){
+function renderTrafficOld(){
   var box=$('#traffic');if(!box)return;
   var max=Math.max.apply(null,TKEYS.map(function(k){return HITS[k[0]]||0}))||1;
   box.innerHTML='';
@@ -10971,12 +10971,12 @@ function fileOpenGuard(it){
     FILE_PEND=it;
     go('p-code');return;
   }
-  openFileView(it);countHit('files');
+  fileOpened(it);
 }
 function fileAfterCode(){
   var it=FILE_PEND;FILE_PEND=null;codeCtxSet('');
   try{renderFiles()}catch(e){}
-  if(it){openFileView(it);countHit('files');}
+  if(it)fileOpened(it);
 }
 /* 後台：檔案清單編輯（加上分類、需要上課代碼） */
 function renderFileEdit(){
@@ -10987,11 +10987,11 @@ function renderFileEdit(){
   if(!list.length){box.innerHTML='<div class="empty">還沒有選檔案</div>';return;}
   var groups=[];list.forEach(function(f){var g=String(f.group||'').trim();if(g&&groups.indexOf(g)<0)groups.push(g)});
   var lab='font-size:calc(13px*var(--fs));color:var(--muted)';
-  box.innerHTML='<datalist id="fileGroupList">'+groups.map(function(g){return '<option value="'+fileEsc(g)+'">'}).join('')+'</datalist>'+
+  box.innerHTML='<div class="hint" id="fileStatSum" style="margin:2px 0 8px"></div><datalist id="fileGroupList">'+groups.map(function(g){return '<option value="'+fileEsc(g)+'">'}).join('')+'</datalist>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px"><button class="qbtn" data-fbulk="on">全部需要上課代碼</button><button class="qbtn" data-fbulk="off">全部不用代碼</button></div>'+
     list.map(function(f,i){
     return '<div class="qe'+(FILE_OPEN[f.id]?' open':'')+'" data-fi="'+i+'"><div class="qe-h"><div class="qe-t">'+fileEsc(fileKind(f.name))+'　'+fileEsc(f.label||f.name)+(f.group?'<div class="row-d" style="margin-top:2px">'+fileEsc(f.group)+'</div>':'')+'</div>'+
-      '<div class="qe-x">'+(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'')+'</div></div><div class="qe-b">'+
+      '<div class="qe-x"><span data-fstat="'+fileEsc(f.id)+'">'+fileStatShort(f)+'</span>'+(f.hidden?'．已隱藏':'')+(f.needCode?'．🔒':'')+'</div></div><div class="qe-b">'+
       '<div class="f"><div class="f-q" style="'+lab+'">顯示名稱</div>'+
       '<input class="f-in" data-fk="label" value="'+fileEsc(f.label||f.name)+'"></div>'+
       '<div class="f"><div class="f-q" style="'+lab+'">分類（可留空）</div>'+
@@ -10999,6 +10999,7 @@ function renderFileEdit(){
       '<input class="f-in" data-fk="group" list="fileGroupList" value="'+fileEsc(f.group||'')+'" placeholder="例如：CPR 課程"></div>'+
       '<div class="f"><div class="f-q" style="'+lab+'">說明（可留空）</div>'+
       '<input class="f-in" data-fk="note" value="'+fileEsc(f.note||'')+'" placeholder="例如：上課前先看這份"></div>'+
+      '<div class="hint" data-fstatl="'+fileEsc(f.id)+'" style="margin:10px 0 6px">'+fileStatLong(f)+'</div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:6px"><span class="startog'+(f.needCode?' on':'')+'" data-fneed>需要輸入上課代碼才能開啟</span></div>'+
       '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:12px;margin-top:8px">'+
       '<button class="qbtn" data-fa="up">↑ 上移</button><button class="qbtn" data-fa="dn">↓ 下移</button>'+
@@ -11013,7 +11014,7 @@ document.addEventListener('click',function(e){
     var b=t.closest('[data-fi]');if(!b)return;
     var f=L[+b.dataset.fi];if(!f)return;
     f.needCode=!f.needCode;t.classList.toggle('on',!!f.needCode);
-    var x=b.querySelector('.qe-x');if(x)x.textContent=(f.hidden?'已隱藏':'顯示中')+(f.needCode?'．🔒':'');
+    var x=b.querySelector('.qe-x');if(x)x.innerHTML='<span data-fstat="'+fileEsc(f.id)+'">'+fileStatShort(f)+'</span>'+(f.hidden?'．已隱藏':'')+(f.needCode?'．🔒':'');
     setDirty(true);try{renderFiles()}catch(err){}return;
   }
   var bk=e.target.closest('[data-fbulk]');
@@ -11065,6 +11066,49 @@ document.addEventListener('click',function(e){
   var f=((SITE.files&&SITE.files.items)||[])[+q.dataset.fi];if(!f)return;
   var on=q.classList.toggle('open');FILE_OPEN[f.id]=on;
 });
+
+/* ===== v11.38 檔案點閱次數、近 7 天每天瀏覽數 ===== */
+function hitDayStr(off){var d=new Date(Date.now()+8*36e5-(off||0)*864e5);return d.toISOString().slice(0,10).replace(/-/g,'')}
+function hitDayCounts(key){return !(key==='video'||key==='ig'||/^(file_|fdl_|day_)/.test(key))}
+function hitDayLocal(key){if(!hitDayCounts(key))return;var k='day_'+hitDayStr(0);HITS[k]=(HITS[k]||0)+1}
+function hitDay(patch,key){if(!hitDayCounts(key)||!window.fb)return;patch['day_'+hitDayStr(0)]=window.fb.increment(1)}
+function fileOpened(it){openFileView(it);countHit('files');countHit('file_'+it.id)}
+function fileOpens(f){return (HITS&&HITS['file_'+f.id])||0}
+function fileDls(f){return (HITS&&HITS['fdl_'+f.id])||0}
+function fileStatShort(f){return '開啟 '+fileOpens(f)}
+function fileStatLong(f){return '開啟 <b>'+fileOpens(f)+'</b> 次．按下載 <b>'+fileDls(f)+'</b> 次'}
+function fileStatsPaint(){
+  var L=(SITE.files&&SITE.files.items)||[];
+  var sum=$('#fileStatSum');
+  if(sum){
+    var tot=0,top=null;L.forEach(function(f){var n=fileOpens(f);tot+=n;if(!top||n>fileOpens(top))top=f});
+    sum.innerHTML=L.length?('全部檔案共開啟 <b>'+tot+'</b> 次'+(top&&fileOpens(top)>0?'．最多人開：'+fileEsc(top.label||top.name)+'（'+fileOpens(top)+'）':'')):'';
+  }
+  $$('#fileEdit [data-fstat]').forEach(function(e){var f=L.filter(function(x){return x.id===e.dataset.fstat})[0];if(f)e.textContent=fileStatShort(f)});
+  $$('#fileEdit [data-fstatl]').forEach(function(e){var f=L.filter(function(x){return x.id===e.dataset.fstatl})[0];if(f)e.innerHTML=fileStatLong(f)});
+}
+function renderWeek(){
+  var box=$('#traffic');if(!box)return;
+  var old=box.querySelector('#weekBox');if(old)old.remove();
+  var days=[],max=1,sum=0,WD=['日','一','二','三','四','五','六'];
+  for(var i=6;i>=0;i--){
+    var ds=hitDayStr(i),n=HITS['day_'+ds]||0;
+    var dt=new Date(Date.UTC(+ds.slice(0,4),+ds.slice(4,6)-1,+ds.slice(6,8)));
+    days.push({ds:ds,n:n,label:(+ds.slice(4,6))+'/'+(+ds.slice(6,8))+'　週'+WD[dt.getUTCDay()],today:i===0});
+    sum+=n;if(n>max)max=n;
+  }
+  var w=document.createElement('div');w.id='weekBox';
+  w.innerHTML='<div class="section-head" style="margin-top:6px"><h2>近 7 天每天瀏覽數</h2><span>合計 '+sum+'．日均 '+Math.round(sum/7)+'</span></div>'+
+    days.map(function(d){
+      return '<div class="trow"><span class="trow-n"'+(d.today?' style="color:var(--signal)"':'')+'>'+d.label+(d.today?'（今天）':'')+'</span>'+
+        '<span class="bar"><i style="width:'+(d.n/max*100)+'%'+(d.today?';background:var(--signal)':'')+'"></i></span>'+
+        '<span class="trow-v">'+d.n+'</span></div>';
+    }).join('')+
+    '<p class="hint">每天的數字從 v11.38 上線那天開始累積（以台灣時間算一天），之前沒有分天的紀錄。不含影片播放與 IG 點擊。</p>'+
+    '<div class="section-head" style="margin-top:22px"><h2>各頁累計</h2><span>從頭到現在</span></div>';
+  box.insertBefore(w,box.firstChild);
+}
+function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileStatsPaint()}catch(e){}}
 
 /* v11.31 即時同步保險：分頁回到前景／網路恢復時重接監聽，拿一次最新的課程設定（後台開關漏接的主因：手機/分頁休眠後連線斷了） */
 (function(){
