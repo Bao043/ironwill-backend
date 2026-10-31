@@ -818,7 +818,16 @@ body.dirty #z-pro{padding-bottom:80px}
 .sc-test{margin:14px 0 4px;padding:10px 12px;border:1px dashed var(--ok);color:var(--ok);font-size:calc(12.5px*var(--fs));line-height:1.5}
 #sceneBox{position:fixed;inset:0;z-index:9999;background:#000}
 #sceneBox[hidden]{display:none}
-#sceneFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+#sceneFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0b0e10;color-scheme:dark;opacity:0;transition:opacity .25s}
+#sceneBox.ready #sceneFrame,#sceneBox.slow #sceneFrame{opacity:1}
+#sceneLoad{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0b0e10;color:#cfd6da;font-size:14px;letter-spacing:.1em;text-align:center;padding:0 24px}
+#sceneLoad b{font-size:17px;letter-spacing:.2em;color:#fff}
+.sl-ring{width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.14);border-top-color:#e2564a;animation:slspin .9s linear infinite}
+@keyframes slspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sl-ring{animation-duration:2.6s}}
+.sl-s{display:none;font-size:12.5px;color:#8b969c;max-width:290px;line-height:1.6;letter-spacing:.02em}
+#sceneBox.slow .sl-s{display:block}
+#sceneBox.ready #sceneLoad{display:none}
 #sceneClose{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);height:36px;padding:0 16px;background:rgba(0,0,0,.62);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:99px;font-size:14px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);white-space:nowrap}
 #sceneBox.ready #sceneClose{display:none}
 .gm-adm .f-in{width:100%}
@@ -2947,6 +2956,7 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
   </section>
   <div id="sceneBox" hidden>
     <button type="button" id="sceneClose" aria-label="離開遊戲">‹ 返回課程</button>
+    <div id="sceneLoad" role="status" aria-live="polite"><i class="sl-ring"></i><b>求生現場</b><span class="sl-t">載入中…</span><span class="sl-s">載入比較久，請再等一下。如果一直停在這裡，可能是場景檔還沒上傳到前台。</span></div>
     <iframe id="sceneFrame" title="求生現場" sandbox="allow-scripts allow-same-origin"></iframe>
   </div>
 
@@ -3630,7 +3640,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.44　2026/10/31';
+var APP_VERSION='v11.46　2026/10/31';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4378,7 +4388,7 @@ document.addEventListener('click',function(e){
   e.preventDefault();toast(gmState().note);
 });
 function gmDay(){try{return JSON.parse(localStorage.getItem('iw-day')||'{}')||{}}catch(e){return {}}}
-function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready');fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
+function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready','slow');clearTimeout(window._gmT);window._gmT=setTimeout(function(){if(!bx.hidden&&!bx.classList.contains('ready'))bx.classList.add('slow')},12000);fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
 function paintScene(){
   var box=$('#sceneList');if(!box)return;
   var st=gmState(),h='',D=gmDay();if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
@@ -11353,6 +11363,12 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.46',d:'2026/10/31',items:[
+  '求生現場題目動畫：題目用打字機效果逐字出現，打完選項才依序淡入，選項出現後才開始倒數；點選的選項會變橘色、字放大，沒選的變暗縮小；點題目可以直接看完整題。',
+  '預防「成績單上下滑不動」：成績單改成只有一層捲動區，結算時放開畫面的觸控綁定（電腦模擬測不出問題，請在 iPad 上實測確認）。',
+  '四個場景檔案都要重新上傳到前台。']},
+ {v:'v11.45',d:'2026/10/31',items:[
+  '修正：打開求生現場時會先白閃一下。現在改成深色底加「載入中」轉圈動畫，場景準備好才顯示；超過 12 秒還沒好，會提示可能是場景檔還沒上傳。']},
  {v:'v11.44',d:'2026/10/31',items:[
   '求生現場：四個急救場景串成「幸福里 7 號樓的一晚」連續故事（燙傷 → 割傷 → 路邊 CPR → 噎住），場景頁依章節排序，並記錄你每一章的成績。',
   '前面章節拿到 A 級以上，後面每個決定多 2 秒思考時間（最多 +6 秒）；每章結算有「下一章」按鈕，也可以按「重新開始這一晚」。',
