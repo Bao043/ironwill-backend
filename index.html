@@ -812,6 +812,7 @@ body.dirty #z-pro{padding-bottom:80px}
 .sc-card .sc-b{flex:1;min-width:0}
 .sc-card .sc-t{font-size:calc(16px*var(--fs));font-weight:600;line-height:1.35}
 .sc-card .sc-d{font-size:calc(13px*var(--fs));color:var(--muted);margin-top:3px;line-height:1.5}
+.sc-sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 4px;font-size:calc(12px*var(--fs));letter-spacing:.04em;color:var(--signal);font-family:var(--mono)}.sc-rs{white-space:nowrap;flex:none;background:none;border:0;color:var(--muted);text-decoration:underline;font-size:calc(12px*var(--fs));cursor:pointer;padding:6px}.sc-rs[hidden]{display:none}.sc-sub{margin:0 0 4px;font-size:calc(13px*var(--fs));color:var(--muted);line-height:1.6}.sc-clk{margin-left:8px;font-family:var(--mono);font-size:calc(11.5px*var(--fs));color:var(--muted);font-weight:400}.sc-r{margin-top:5px;font-size:calc(12.5px*var(--fs));color:var(--signal);font-weight:600}.sc-card.sc-next .sc-go{outline:2px solid var(--signal);outline-offset:2px}
 .sc-card .sc-go{flex:none;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 16px;font-size:calc(13.5px*var(--fs));cursor:pointer;min-height:40px}
 .sc-card.off{opacity:.45}.sc-card.off .sc-go{background:none;color:var(--muted);border-color:var(--line);cursor:default}
 .sc-test{margin:14px 0 4px;padding:10px 12px;border:1px dashed var(--ok);color:var(--ok);font-size:calc(12.5px*var(--fs));line-height:1.5}
@@ -3629,7 +3630,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.41　2026/10/31';
+var APP_VERSION='v11.44　2026/10/31';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4328,14 +4329,14 @@ var GM_CFG={mode:'soon',at:0,end:0,note:''};
 var GM_GAMES=[
  {id:'bedroom',k:'火災',t:'夜間臥室',d:'凌晨，煙霧警報器響了，門縫下透著橘紅色的光。',file:'scene-bedroom.html',ready:true},
  {id:'quake',k:'地震',t:'凌晨搖晃',d:'03:12，整棟樓劇烈搖晃。',ready:false},
- {id:'cpr',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
- {id:'choke',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
+ {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
+ {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
  {id:'pan',k:'火災',t:'廚房油鍋起火',d:'炒菜的時候，鍋子著火了。',ready:false},
  {id:'mall',k:'火災',t:'商場走道的警報',d:'人潮中警報大響，走道開始有煙。',ready:false},
  {id:'co',k:'一氧化碳',t:'浴室熱水器',d:'洗澡洗到一半，頭好暈。',ready:false},
  {id:'flood',k:'淹水',t:'颱風夜的停車場',d:'地下停車場，水位正在上升。',ready:false},
- {id:'bleed',k:'急救',t:'廚房割傷',d:'傷口一直流血，止不住。直接加壓與包紮。',file:'scene-bleed.html',ready:true},
- {id:'burn',k:'急救',t:'熱水燙傷',d:'小孩被熱水燙到了。沖脫泡蓋送。',file:'scene-burn.html',ready:true}
+ {id:'bleed',day:2,clock:'18:05',k:'急救',t:'廚房割傷',d:'傷口一直流血，止不住。直接加壓與包紮。',file:'scene-bleed.html',ready:true},
+ {id:'burn',day:1,clock:'17:48',k:'急救',t:'熱水燙傷',d:'小孩被熱水燙到了。沖脫泡蓋送。',file:'scene-burn.html',ready:true}
 ];
 function gmTile(){return TILES.filter(function(t){return t.id==='scene'})[0]}
 function gmApplyCfg(c){if(c)GM_CFG={mode:c.mode||'soon',at:+c.at||0,end:+c.end||0,note:c.note||''}}
@@ -4376,27 +4377,25 @@ document.addEventListener('click',function(e){
   var t=e.target.closest('[data-gmlock]');if(!t||EDITING)return;
   e.preventDefault();toast(gmState().note);
 });
+function gmDay(){try{return JSON.parse(localStorage.getItem('iw-day')||'{}')||{}}catch(e){return {}}}
+function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready');fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
 function paintScene(){
   var box=$('#sceneList');if(!box)return;
-  var st=gmState(),h='';
-  if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
-  h+=GM_GAMES.map(function(g){
-    var can=g.ready&&(st.open||PREVIEW);
-    return '<div class="sc-card'+(g.ready?'':' off')+'"><span class="sc-k">'+hmEsc(g.k)+'</span>'+
-      '<span class="sc-b"><div class="sc-t">'+hmEsc(g.t)+'</div><div class="sc-d">'+hmEsc(g.d)+'</div></span>'+
-      '<button type="button" class="sc-go" '+(can?'data-scgo="'+hmEsc(g.id)+'"':'disabled')+'>'+(g.ready?'開始':'設計中')+'</button></div>';
-  }).join('');
+  var st=gmState(),h='',D=gmDay();if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
+  var story=GM_GAMES.filter(function(g){return g.day}).sort(function(a,b){return a.day-b.day}),other=GM_GAMES.filter(function(g){return !g.day});var nx=story.filter(function(g){return !D[g.id]})[0],dn=story.filter(function(g){return D[g.id]}).length;
+  function card(g){
+    var can=g.ready&&(st.open||PREVIEW),r=D[g.id],isN=nx&&nx.id===g.id;
+    return '<div class="sc-card'+(g.ready?'':' off')+(isN?' sc-next':'')+'"><span class="sc-k">'+hmEsc(g.day?'第 '+g.day+' 章':g.k)+'</span>'+
+      '<span class="sc-b"><div class="sc-t">'+hmEsc(g.t)+(g.clock?'<em class="sc-clk">'+hmEsc(g.clock)+'</em>':'')+'</div><div class="sc-d">'+hmEsc(g.d)+'</div>'+
+      (r?'<div class="sc-r">你的成績　'+hmEsc(r.r)+' 級'+(r.q?'　追問 '+hmEsc(r.q):'')+'</div>':(isN?'<div class="sc-r">下一章</div>':''))+'</span>'+
+      '<button type="button" class="sc-go" '+(can?'data-scgo="'+hmEsc(g.id)+'"':'disabled')+'>'+(g.ready?(r?'重玩':'開始'):'設計中')+'</button></div>';
+  }
+  h+='<div class="sc-sec">幸福里 7 號樓的一晚　連續故事　'+dn+' / '+story.length+' 章<button type="button" class="sc-rs" data-scday-reset="1"'+(dn?'':' hidden')+'>重新開始這一晚</button></div><p class="sc-sub">同一個傍晚，同一棟樓。照順序玩，前面章節拿到 A 級以上，後面每個決定會多幾秒思考時間。</p>'+story.map(card).join('');h+='<div class="sc-sec">單獨場景</div>'+other.map(card).join('');
   box.innerHTML=h;
 }
 document.addEventListener('click',function(e){
-  var b=e.target.closest('[data-scgo]');
-  if(b){
-    var g=GM_GAMES.filter(function(x){return x.id===b.dataset.scgo})[0];if(!g||!g.file)return;
-    var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!fr||!bx)return;
-    bx.classList.remove('ready');fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;
-    try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}
-    return;
-  }
+  var rs=e.target.closest('[data-scday-reset]');if(rs){try{localStorage.removeItem('iw-day')}catch(err){}paintScene();return}
+  var b=e.target.closest('[data-scgo]');if(b){gmOpen(GM_GAMES.filter(function(x){return x.id===b.dataset.scgo})[0]);return}
   if(e.target.closest('#sceneClose'))gmCloseGame();
 });
 window.addEventListener('message',function(e){
@@ -4404,8 +4403,10 @@ window.addEventListener('message',function(e){
   if(!fr||!bx||bx.hidden||e.source!==fr.contentWindow||!e.data||typeof e.data!=='object')return;
   if(e.data.iw==='ready')bx.classList.add('ready');
   else if(e.data.iw==='fail')bx.classList.remove('ready');
-  else if(e.data.iw==='close')gmCloseGame();
+  else if(e.data.iw==='close'){gmCloseGame();try{paintScene()}catch(err){}}
+  else if(e.data.iw==='next'){var g=GM_GAMES.filter(function(x){return x.id===e.data.id&&x.ready})[0];if(g){gmCloseGame();setTimeout(function(){gmOpen(g)},250)}}
 });
+
 function gmCloseGame(){
   var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!bx||bx.hidden)return;
   fr.src='about:blank';bx.hidden=true;
@@ -10327,7 +10328,7 @@ function hmFeatDecor(el,t){
   var raf=0;
   function fix(){
     raf=0;
-    var lay=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0);
+    var lay=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0);if(Math.abs(vv.offsetTop)>1.5)return; /* v11.43：回彈（橡皮筋）時 offsetTop 不是 0，gap 會亂跳、底部那排浮起來 → 回彈期間維持上一個值 */
     var gap=Math.round(lay-vv.height-vv.offsetTop);
     if(!(gap>0)||gap>160||vv.scale>1.05)gap=0;           // 鍵盤打開、放大時不處理
     document.documentElement.style.setProperty('--vvb',gap+'px');
@@ -11352,6 +11353,18 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.44',d:'2026/10/31',items:[
+  '求生現場：四個急救場景串成「幸福里 7 號樓的一晚」連續故事（燙傷 → 割傷 → 路邊 CPR → 噎住），場景頁依章節排序，並記錄你每一章的成績。',
+  '前面章節拿到 A 級以上，後面每個決定多 2 秒思考時間（最多 +6 秒）；每章結算有「下一章」按鈕，也可以按「重新開始這一晚」。',
+  '每個急救場景新增「現場追問」6 題快問快答（每次從 11 題題庫隨機抽），結算會顯示追問成績與知識卡；結算畫面新增「回首頁」。',
+  '救護車、人物全部重做：寫實救護車（紅藍警示燈、條紋、119、輪胎），人物有五官、會眨眼、手指與呼吸，走路擺臂彎膝。',
+  '四個場景檔案都要重新上傳到前台（和 index.html 同一層）。']},
+ {v:'v11.43',d:'2026/10/31',items:[
+  '修正 iPhone 後台：捲到最上面再往下拉（回彈）時，下面那排（課程／題庫／內容／設定、回控制台）會被往上推浮起來，現在回彈時不動。']},
+ {v:'v11.42',d:'2026/10/31',items:[
+  '求生現場新增急救四部曲：「路邊倒下的人」（CPR／AED）、「餐桌上的噎住」、「廚房割傷」、「熱水燙傷」，每個都有手部互動、4 個限時決策、評分評級和知識卡。',
+  '四個遊戲檔案：scene-cpr.html、scene-choke.html、scene-bleed.html、scene-burn.html，要上傳到前台（和 index.html 同一層）。',
+  '知識卡內容標示「待對照官方原文」，上線前請用最新急救指引核對。']},
  {v:'v11.41',d:'2026/10/31',items:[
   '首頁新增「求生現場」磁磚（第一人稱情境遊戲）：目前是「開發中」鎖定，學員點了只會看到提示。',
   '後台「內容 → 學員首頁」多了求生現場設定：開發中／開放／維修中／預約開放，可設開放與自動關閉時間，學員端即時跟著變。',
