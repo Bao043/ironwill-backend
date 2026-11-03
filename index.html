@@ -223,6 +223,21 @@ h1,h2,h3{margin:0;font-weight:500;letter-spacing:-.01em}
 .opt-t{flex:1;min-width:0;line-height:1.75;overflow-wrap:anywhere}
 #qopts{position:relative;z-index:2}
 .opt.on .opt-k{color:var(--signal)}
+/* v11.46 選項動畫：選中放大變色、其他變淡；題目打字機與選項淡入 */
+.opt{transition:border-color .2s,background .2s,opacity .25s,box-shadow .2s}
+.opt-t{transition:font-size .22s cubic-bezier(.2,.9,.3,1),font-weight .2s,color .2s}
+.opt-k{transition:background .2s,color .2s,transform .25s}
+.opt.tw-in{animation:optin .42s cubic-bezier(.22,.61,.36,1) backwards;animation-delay:var(--d,0ms)}
+.opt.on{border-color:var(--signal);background:var(--paper);box-shadow:inset 4px 0 0 var(--signal);animation:optpick .38s cubic-bezier(.2,.9,.3,1.3)}
+.opt.on .opt-t{font-size:1.12em;font-weight:600;color:var(--ink)}
+.opt.on .opt-k{color:var(--paper);background:var(--signal);border-radius:50%;width:1.7em;height:1.7em;padding:0;margin-top:1px;display:grid;place-items:center;transform:scale(1.08)}
+#qopts:has(.opt.on) .opt:not(.on),.ch-opts:has(.opt.on) .opt:not(.on){opacity:.5}
+.opt.tw-hide{opacity:0!important;transform:translateY(10px);pointer-events:none;animation:none!important}
+@keyframes optin{from{opacity:0;transform:translateY(10px)}}
+@keyframes optpick{0%{transform:scale(.97)}55%{transform:scale(1.02)}100%{transform:scale(1)}}
+.tw-typing::after{content:'';display:inline-block;width:2px;height:1.05em;margin-left:3px;vertical-align:-.15em;background:var(--signal);animation:twblink .8s steps(1) infinite}
+@keyframes twblink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.opt.on,.opt.tw-in{animation:none}.opt,.opt-t,.opt-k{transition:none}.tw-typing::after{animation:none}}
 .ans{border-bottom:1px solid var(--line-soft);padding:16px 0}
 .ans-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;cursor:pointer}
 .ans-q{font-size:calc(15px*var(--fs));line-height:1.6;flex:1}
@@ -814,6 +829,16 @@ body.dirty #z-pro{padding-bottom:80px}
 .sc-card .sc-d{font-size:calc(13px*var(--fs));color:var(--muted);margin-top:3px;line-height:1.5}
 .sc-sec{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 4px;font-size:calc(12px*var(--fs));letter-spacing:.04em;color:var(--signal);font-family:var(--mono)}.sc-rs{white-space:nowrap;flex:none;background:none;border:0;color:var(--muted);text-decoration:underline;font-size:calc(12px*var(--fs));cursor:pointer;padding:6px}.sc-rs[hidden]{display:none}.sc-sub{margin:0 0 4px;font-size:calc(13px*var(--fs));color:var(--muted);line-height:1.6}.sc-clk{margin-left:8px;font-family:var(--mono);font-size:calc(11.5px*var(--fs));color:var(--muted);font-weight:400}.sc-r{margin-top:5px;font-size:calc(12.5px*var(--fs));color:var(--signal);font-weight:600}.sc-card.sc-next .sc-go{outline:2px solid var(--signal);outline-offset:2px}
 .sc-card .sc-go{flex:none;border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 16px;font-size:calc(13.5px*var(--fs));cursor:pointer;min-height:40px}
+.sc-hub{display:grid;gap:14px;margin:10px 0 4px}@media(min-width:700px){.sc-hub{grid-template-columns:1fr 1fr}}
+.sc-cat{display:flex;flex-direction:column;gap:8px;text-align:left;padding:22px 20px;border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer;min-height:168px;font:inherit;transition:border-color .2s,transform .2s}
+.sc-cat:hover,.sc-cat:focus-visible{border-color:var(--ink)}.sc-cat:active{transform:scale(.985)}
+.sc-cat .sc-ck{font-family:var(--mono);font-size:calc(11px*var(--fs));letter-spacing:.1em;color:var(--signal)}
+.sc-cat .sc-ct{font-size:calc(24px*var(--fs));font-weight:700;line-height:1.25}
+.sc-cat .sc-cd{font-size:calc(13.5px*var(--fs));color:var(--muted);line-height:1.6;flex:1}
+.sc-cat .sc-cf{font-family:var(--mono);font-size:calc(12px*var(--fs));color:var(--signal)}
+.sc-bk{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:inherit;font-size:calc(13.5px*var(--fs));padding:8px 0;margin-bottom:2px;cursor:pointer;min-height:40px}
+.sc-bk:hover{color:var(--ink)}
+.sc-ch{font-size:calc(22px*var(--fs));font-weight:700;margin:2px 0 2px}
 .sc-card.off{opacity:.45}.sc-card.off .sc-go{background:none;color:var(--muted);border-color:var(--line);cursor:default}
 .sc-test{margin:14px 0 4px;padding:10px 12px;border:1px dashed var(--ok);color:var(--ok);font-size:calc(12.5px*var(--fs));line-height:1.5}
 #sceneBox{position:fixed;inset:0;z-index:9999;background:#000}
@@ -2439,7 +2464,7 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
       </div>
       <div class="act" id="actPreview">
         <svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3.2"/></svg>
-        <div class="act-b"><div class="act-t">學員端預覽</div><div class="act-d">快速檢查版面，送出的表單不會存檔．「求生現場」開發中也從這裡進去測試</div></div>
+        <div class="act-b"><div class="act-t">學員端預覽</div><div class="act-d">快速檢查版面，送出的表單不會存檔．「情境學院」開發中也從這裡進去測試</div></div>
         <div class="act-go">→</div>
       </div>
       <div class="act" id="actOpen">
@@ -2946,18 +2971,18 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     <div id="chBody" style="padding-top:22px"></div>
   </section>
 
-  <!-- 求生現場（情境遊戲） -->
+  <!-- 情境學院（情境遊戲） -->
   <section class="page" id="p-scene">
-    <div class="pg-k rv">求生現場</div>
+    <div class="pg-k rv">情境學院</div>
     <h1 class="display rv">災難發生的那一刻，你會怎麼做？</h1>
-    <p class="p rv">第一人稱的情境模擬，每個選擇只有幾秒鐘。做完會告訴你哪裡對、哪裡要修正。</p>
+    <p class="p rv">第一人稱的情境模擬，分成「急救現場」和「求生現場」。每個選擇只有幾秒鐘，做完會告訴你哪裡對、哪裡要修正。</p>
     <div class="rv" id="sceneList"></div>
     <p class="note rv">教育用途的模擬，內容正式上線前會逐條對照官方資料。建議手機直立、戴上耳機。</p>
   </section>
   <div id="sceneBox" hidden>
     <button type="button" id="sceneClose" aria-label="離開遊戲">‹ 返回課程</button>
-    <div id="sceneLoad" role="status" aria-live="polite"><i class="sl-ring"></i><b>求生現場</b><span class="sl-t">載入中…</span><span class="sl-s">載入比較久，請再等一下。如果一直停在這裡，可能是場景檔還沒上傳到前台。</span></div>
-    <iframe id="sceneFrame" title="求生現場" sandbox="allow-scripts allow-same-origin"></iframe>
+    <div id="sceneLoad" role="status" aria-live="polite"><i class="sl-ring"></i><b>情境學院</b><span class="sl-t">載入中…</span><span class="sl-s">載入比較久，請再等一下。如果一直停在這裡，可能是場景檔還沒上傳到前台。</span></div>
+    <iframe id="sceneFrame" title="情境學院" sandbox="allow-scripts allow-same-origin"></iframe>
   </div>
 
   <section class="page" id="p-files">
@@ -3617,7 +3642,7 @@ function watchCourse(){
     if(v.sessions&&v.sessions.length)SESSIONS=v.sessions;
     if(v.code&&String(v.code)!==CODE){CODE=String(v.code);try{showCode()}catch(e){}}
     try{applyQuizVis();checkTopPublished();}catch(e){}
-    // 求生現場：開發中／維修中／預約開放，學員畫面不用重新整理（gmTick 每秒比對）
+    // 情境學院：開發中／維修中／預約開放，學員畫面不用重新整理（gmTick 每秒比對）
     try{
       if(v.scene)gmApplyCfg(v.scene);
       var st2=(v.tiles||[]).filter(function(t){return t.id==='scene'})[0],mine2=gmTile();
@@ -3640,7 +3665,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.46　2026/10/31';
+var APP_VERSION='v11.49　2026/11/03';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -3775,7 +3800,7 @@ function reveal(root){
 }
 
 /* ---- router ---- */
-var TITLES={'p-scene':'求生現場','p-about':'講師介紹','p-quiz':'上課專區','p-run':'課後測驗','p-explain':'題目詳解','p-stats':'本堂統計','p-code':'上課代號','p-profile':'基本資料','p-name':'課後測驗','p-top3':'前三名',
+var TITLES={'p-scene':'情境學院','p-about':'講師介紹','p-quiz':'上課專區','p-run':'課後測驗','p-explain':'題目詳解','p-stats':'本堂統計','p-code':'上課代號','p-profile':'基本資料','p-name':'課後測驗','p-top3':'前三名',
   'p-feedback':'課程回饋','p-invite':'課程邀約','p-disaster':'防災知識專區','p-firstaid':'急救教育專區',
   'p-article':'文章','p-whisper':'傳聲悄悄話','p-challenge':'挑戰題庫','p-files':'檔案下載'};
 var stack=['p-home'];
@@ -3833,7 +3858,7 @@ function go(id){ if(id==='p-quiz'&&!EDITING&&!hasPassed()){pending='p-quiz';code
   if(id==='p-scene'){
     var gst=gmState();
     if(!gst.open&&!PREVIEW&&!EDITING){toast(gst.note);stack.pop();show(stack[stack.length-1]||'p-home',true);return;}
-    paintScene();
+    SC_CAT='';paintScene();
   }
   if(id==='p-challenge'){
     var cst=chState();
@@ -4332,12 +4357,12 @@ function chOnClose(st){
   if((CH.step==='run'||CH.step==='review')&&st.mode==='ended'){CH.timeup=true;renderChallenge();window.scrollTo({top:0,behavior:'instant'});return;}
   if(CH.step==='pick'){toast(st.note||'挑戰題庫目前沒有開放');stack=['p-home'];show('p-home',true);}
 }
-/* ===================== 求生現場（情境遊戲）：開發中鎖定／預約開放／維修 =====================
+/* ===================== 情境學院（情境遊戲）：開發中鎖定／預約開放／維修 =====================
    狀態存在課程文件 courses/{課程}.scene；學員端每秒比對一次，講師按了不用重新整理就跟著變。
-   「學員端預覽」裡可以進去測試（一般學員與正式學員端仍鎖定）。遊戲本體是獨立檔案（scene-bedroom / scene-cpr / scene-choke / scene-bleed / scene-burn .html），放在前台網站同一層。 */
+   「學員端預覽」裡可以進去測試（一般學員與正式學員端仍鎖定）。遊戲本體是獨立檔案（scene-apartment / scene-cpr / scene-choke / scene-bleed / scene-burn .html），放在前台網站同一層。 */
 var GM_CFG={mode:'soon',at:0,end:0,note:''};
 var GM_GAMES=[
- {id:'bedroom',k:'火災',t:'夜間臥室',d:'凌晨，煙霧警報器響了，門縫下透著橘紅色的光。',file:'scene-bedroom.html',ready:true},
+ {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。第一人稱，可以自己走動、查看、動手。',file:'scene-apartment.html',ready:true},
  {id:'quake',k:'地震',t:'凌晨搖晃',d:'03:12，整棟樓劇烈搖晃。',ready:false},
  {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
  {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
@@ -4356,9 +4381,9 @@ function gmState(){
   if(!t||!t.on)return {open:false,visible:false,mode:'hidden'};
   var m=GM_CFG.mode||'soon',now=Date.now();
   if(m==='scheduled'&&GM_CFG.at&&now>=GM_CFG.at)m='open';
-  if(m==='soon')return {open:false,visible:true,mode:m,badge:'開發中',sub:'Coming Soon',note:GM_CFG.note||'「求生現場」開發中，敬請期待'};
-  if(m==='pause')return {open:false,visible:true,mode:m,badge:'維修中',sub:'維修中',note:GM_CFG.note||'「求生現場」維修中，請稍後再來'};
-  if(m==='scheduled')return {open:false,visible:true,mode:m,badge:'即將開放',sub:chFmt(GM_CFG.at)+' 開放',note:GM_CFG.note||('「求生現場」將於 '+chFmt(GM_CFG.at,true)+' 開放')};
+  if(m==='soon')return {open:false,visible:true,mode:m,badge:'開發中',sub:'Coming Soon',note:GM_CFG.note||'「情境學院」開發中，敬請期待'};
+  if(m==='pause')return {open:false,visible:true,mode:m,badge:'維修中',sub:'維修中',note:GM_CFG.note||'「情境學院」維修中，請稍後再來'};
+  if(m==='scheduled')return {open:false,visible:true,mode:m,badge:'即將開放',sub:chFmt(GM_CFG.at)+' 開放',note:GM_CFG.note||('「情境學院」將於 '+chFmt(GM_CFG.at,true)+' 開放')};
   if(GM_CFG.end&&now>=GM_CFG.end)return {open:false,visible:true,mode:'ended',badge:'已結束',sub:chFmt(GM_CFG.end)+' 已關閉',note:GM_CFG.note||'這一次的開放時間已經結束，謝謝參與！'};
   return {open:true,visible:true,mode:'open',end:GM_CFG.end||0};
 }
@@ -4389,10 +4414,15 @@ document.addEventListener('click',function(e){
 });
 function gmDay(){try{return JSON.parse(localStorage.getItem('iw-day')||'{}')||{}}catch(e){return {}}}
 function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready','slow');clearTimeout(window._gmT);window._gmT=setTimeout(function(){if(!bx.hidden&&!bx.classList.contains('ready'))bx.classList.add('slow')},12000);fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
+var SC_CAT='';
+var SC_CATS={aid:{k:'FIRST AID',t:'急救現場',d:'身邊的人受傷、倒下、噎住的那一刻。四個連續的急救情境，學會第一時間該做什麼。'},
+             surv:{k:'SURVIVAL',t:'求生現場',d:'火災、地震、一氧化碳、淹水。自己就在現場，要先保護自己、再想辦法離開。'}};
 function paintScene(){
   var box=$('#sceneList');if(!box)return;
   var st=gmState(),h='',D=gmDay();if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
-  var story=GM_GAMES.filter(function(g){return g.day}).sort(function(a,b){return a.day-b.day}),other=GM_GAMES.filter(function(g){return !g.day});var nx=story.filter(function(g){return !D[g.id]})[0],dn=story.filter(function(g){return D[g.id]}).length;
+  var aid=GM_GAMES.filter(function(g){return g.day}).sort(function(a,b){return a.day-b.day}),surv=GM_GAMES.filter(function(g){return !g.day});
+  surv.sort(function(a,b){return (b.ready?1:0)-(a.ready?1:0)});
+  var nx=aid.filter(function(g){return !D[g.id]})[0],dn=aid.filter(function(g){return D[g.id]}).length;
   function card(g){
     var can=g.ready&&(st.open||PREVIEW),r=D[g.id],isN=nx&&nx.id===g.id;
     return '<div class="sc-card'+(g.ready?'':' off')+(isN?' sc-next':'')+'"><span class="sc-k">'+hmEsc(g.day?'第 '+g.day+' 章':g.k)+'</span>'+
@@ -4400,10 +4430,23 @@ function paintScene(){
       (r?'<div class="sc-r">你的成績　'+hmEsc(r.r)+' 級'+(r.q?'　追問 '+hmEsc(r.q):'')+'</div>':(isN?'<div class="sc-r">下一章</div>':''))+'</span>'+
       '<button type="button" class="sc-go" '+(can?'data-scgo="'+hmEsc(g.id)+'"':'disabled')+'>'+(g.ready?(r?'重玩':'開始'):'設計中')+'</button></div>';
   }
-  h+='<div class="sc-sec">幸福里 7 號樓的一晚　連續故事　'+dn+' / '+story.length+' 章<button type="button" class="sc-rs" data-scday-reset="1"'+(dn?'':' hidden')+'>重新開始這一晚</button></div><p class="sc-sub">同一個傍晚，同一棟樓。照順序玩，前面章節拿到 A 級以上，後面每個決定會多幾秒思考時間。</p>'+story.map(card).join('');h+='<div class="sc-sec">單獨場景</div>'+other.map(card).join('');
+  if(SC_CAT!=='aid'&&SC_CAT!=='surv')SC_CAT='';
+  if(!SC_CAT){
+    var sr=surv.filter(function(g){return g.ready}).length;
+    h+='<div class="sc-hub">'+
+      '<button type="button" class="sc-cat" data-sccat="aid"><span class="sc-ck">'+SC_CATS.aid.k+'</span><span class="sc-ct">'+SC_CATS.aid.t+'</span><span class="sc-cd">'+SC_CATS.aid.d+'</span><span class="sc-cf">'+aid.length+' 個情境　連續故事　'+dn+' / '+aid.length+' 章　›</span></button>'+
+      '<button type="button" class="sc-cat" data-sccat="surv"><span class="sc-ck">'+SC_CATS.surv.k+'</span><span class="sc-ct">'+SC_CATS.surv.t+'</span><span class="sc-cd">'+SC_CATS.surv.d+'</span><span class="sc-cf">'+surv.length+' 個情境　'+sr+' 個可玩　›</span></button>'+
+    '</div>';
+  }else if(SC_CAT==='aid'){
+    h+='<button type="button" class="sc-bk" data-sccat="">‹ 情境學院</button><div class="sc-ch">'+SC_CATS.aid.t+'</div>';
+    h+='<div class="sc-sec">幸福里 7 號樓的一晚　連續故事　'+dn+' / '+aid.length+' 章<button type="button" class="sc-rs" data-scday-reset="1"'+(dn?'':' hidden')+'>重新開始這一晚</button></div><p class="sc-sub">同一個傍晚，同一棟樓。照順序玩，前面章節拿到 A 級以上，後面每個決定會多幾秒思考時間。</p>'+aid.map(card).join('');
+  }else{
+    h+='<button type="button" class="sc-bk" data-sccat="">‹ 情境學院</button><div class="sc-ch">'+SC_CATS.surv.t+'</div><p class="sc-sub">自己就在現場。靠近物件會出現提示，需要判斷時會有選項。</p>'+surv.map(card).join('');
+  }
   box.innerHTML=h;
 }
 document.addEventListener('click',function(e){
+  var ct=e.target.closest('[data-sccat]');if(ct){SC_CAT=ct.dataset.sccat||'';paintScene();try{window.scrollTo({top:0,behavior:'instant'})}catch(err){window.scrollTo(0,0)}return}
   var rs=e.target.closest('[data-scday-reset]');if(rs){try{localStorage.removeItem('iw-day')}catch(err){}paintScene();return}
   var b=e.target.closest('[data-scgo]');if(b){gmOpen(GM_GAMES.filter(function(x){return x.id===b.dataset.scgo})[0]);return}
   if(e.target.closest('#sceneClose'))gmCloseGame();
@@ -4431,19 +4474,19 @@ setInterval(function(){
     try{renderTiles()}catch(e){}
     var pg=document.querySelector('.page.is-on');
     if(pg&&pg.id==='p-scene'){
-      if(!st.open&&!PREVIEW){gmCloseGame();toast(st.note||'「求生現場」目前沒有開放');stack=['p-home'];show('p-home',true);}
+      if(!st.open&&!PREVIEW){gmCloseGame();toast(st.note||'「情境學院」目前沒有開放');stack=['p-home'];show('p-home',true);}
       else paintScene();
     }
   }
   GM_SIG=sig;
 },1000);
-/* 後台：內容 › 學員首頁 › 求生現場開放設定 */
+/* 後台：內容 › 學員首頁 › 情境學院開放設定 */
 function renderGmAdmin(){
   var box=$('#gmAdmin');if(!box)return;
   var t=gmTile();if(!t){box.innerHTML='';return;}
   var m=GM_CFG.mode||'soon',st=gmState();
   var M=[['soon','開發中'],['open','開放'],['pause','維修中'],['scheduled','預約開放']];
-  var h='<div class="section-head" style="margin-top:22px"><h2>求生現場</h2><span>'+hmEsc(t.on?(st.open?'開放中':st.badge||'關閉'):'已隱藏')+'</span></div>'+
+  var h='<div class="section-head" style="margin-top:22px"><h2>情境學院</h2><span>'+hmEsc(t.on?(st.open?'開放中':st.badge||'關閉'):'已隱藏')+'</span></div>'+
     '<p class="sub">情境遊戲的開放狀態。學員端會即時跟著變；選「開發中」時學員只看到鎖住的磁磚。你可以到「學員端預覽」按這塊磁磚進去測試，不受狀態影響。</p>'+
     '<div class="chips" data-one id="gmModes">'+M.map(function(x){return '<span class="chip'+(m===x[0]?' on':'')+'" data-gmmode="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div>';
   if(m==='scheduled'){
@@ -4456,7 +4499,7 @@ function renderGmAdmin(){
       (GM_CFG.end?'<button type="button" class="qbtn" data-gmtime="clear">不關閉</button>':'')+'</div></div>';
   }
   h+='<div class="f" style="padding-top:14px"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">學員點下去看到的提示（可留空）</div>'+
-    '<input class="f-in" id="gmNote" maxlength="60" value="'+hmEsc(GM_CFG.note)+'" placeholder="'+(m==='pause'?'例如：維修中，下課後再來':m==='scheduled'?'例如：課程結束後開放':'「求生現場」開發中，敬請期待')+'"></div>'+
+    '<input class="f-in" id="gmNote" maxlength="60" value="'+hmEsc(GM_CFG.note)+'" placeholder="'+(m==='pause'?'例如：維修中，下課後再來':m==='scheduled'?'例如：課程結束後開放':'「情境學院」開發中，敬請期待')+'"></div>'+
     '<p class="hint" style="margin-top:8px">要整塊磁磚隱藏，用上面「功能磁磚」的開關。</p>';
   box.innerHTML=h;
 }
@@ -4482,30 +4525,30 @@ document.addEventListener('click',function(e){
     var v=c.dataset.gmmode,p={mode:v};
     if(v==='scheduled'&&(!GM_CFG.at||GM_CFG.at<Date.now())){var nx=new Date();nx.setMinutes(0,0,0);nx.setHours(nx.getHours()+1);p.at=nx.getTime();}
     if((v==='open'||v==='scheduled')&&GM_CFG.end&&GM_CFG.end<=Date.now())p.end=0;
-    gmCommit(p,{soon:'求生現場：開發中',open:'求生現場：開放',pause:'求生現場：維修中',scheduled:'求生現場：預約開放'}[v]);
+    gmCommit(p,{soon:'情境學院：開發中',open:'情境學院：開放',pause:'情境學院：維修中',scheduled:'情境學院：預約開放'}[v]);
     return;
   }
   var tb=e.target.closest('#gmAdmin [data-gmtime]');
   if(tb){
     var k=tb.dataset.gmtime,now=Date.now();
-    if(k==='clear'){gmCommit({end:0},'求生現場：取消自動關閉');return;}
+    if(k==='clear'){gmCommit({end:0},'情境學院：取消自動關閉');return;}
     var inp=$(k==='at'?'#gmAt':'#gmEnd'),ms=inp&&inp.value?new Date(inp.value).getTime():0;
     if(!ms||isNaN(ms)){toast(k==='at'?'先選開放時間':'先選關閉時間');return;}
     if(k==='at'){
       if(ms<=now&&!confirm('這個時間已經過了，存了就會直接開放。確定嗎？'))return;
       if(GM_CFG.end&&ms>=GM_CFG.end){toast('開放時間要早於關閉時間（'+chFmt(GM_CFG.end)+'）');return;}
-      gmCommit({at:ms},'求生現場：預約 '+chFmt(ms)+' 開放');
+      gmCommit({at:ms},'情境學院：預約 '+chFmt(ms)+' 開放');
     }else{
       if(ms<=now){toast('關閉時間要選未來的時間');return;}
       if(GM_CFG.mode==='scheduled'&&GM_CFG.at&&ms<=GM_CFG.at){toast('關閉時間要晚於開放時間（'+chFmt(GM_CFG.at)+'）');return;}
-      gmCommit({end:ms},'求生現場：'+chFmt(ms)+' 自動關閉');
+      gmCommit({end:ms},'情境學院：'+chFmt(ms)+' 自動關閉');
     }
   }
 });
 document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='gmNote'){
     var v=e.target.value.trim();if(v===GM_CFG.note)return;
-    gmCommit({note:v},'求生現場：更新提示文字');
+    gmCommit({note:v},'情境學院：更新提示文字');
   }
 });
 /* 最上面的倒數條 */
@@ -5447,7 +5490,7 @@ var TILES=[
  {id:'disaster', t:'防災知識專區', icon:'flame', go:'p-disaster',  on:true},
  {id:'firstaid', t:'急救教育專區', icon:'heart', go:'p-firstaid',  on:true},
  {id:'challenge',t:'挑戰題庫',     icon:'target',go:'p-challenge', on:false},
- {id:'scene',    t:'求生現場',     icon:'scene', go:'p-scene',     on:true},
+ {id:'scene',    t:'情境學院',     icon:'scene', go:'p-scene',     on:true},
  {id:'files',    t:'檔案下載',     icon:'file',  go:'p-files',     on:true},
  {id:'whisper',  t:'傳聲悄悄話',   icon:'lock',  go:'p-whisper',   on:true}
 ];
@@ -6952,7 +6995,8 @@ function applyPayload(p){
             TILES.splice(at,0,Object.assign({},def));
           }
         });
-        TILES.forEach(function(t){if(t.id==='quiz'&&t.t==='線上測驗')t.t='上課專區';});   // v11 改名
+        TILES.forEach(function(t){if(t.id==='quiz'&&t.t==='線上測驗')t.t='上課專區';});
+        TILES.forEach(function(t){if(t.id==='scene'&&t.t==='求生現場')t.t='情境學院';});   // v11.47 改名   // v11 改名
       }
       try{chApplyCfg(d.challenge)}catch(e){}
       try{gmApplyCfg(d.scene)}catch(e){}
@@ -9852,7 +9896,7 @@ function paintHomeTiles(){
       '<span class="ht-t">'+hmEsc(t.t)+'<em>'+hmEsc(note)+'</em></span>'+
       '<span class="sw'+(t.on?' on':'')+'" data-htile="'+hmEsc(t.id)+'" role="switch" aria-checked="'+(!!t.on)+'" tabindex="0" aria-label="'+hmEsc(t.t)+'"></span></div>';
   }).join('');
-  try{renderGmAdmin()}catch(e){console.warn('求生現場設定',e)}
+  try{renderGmAdmin()}catch(e){console.warn('情境學院設定',e)}
 }
 function htFlip(sw){
   var t=TILES.filter(function(x){return x.id===sw.dataset.htile})[0];if(!t)return;
@@ -11363,6 +11407,24 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.49',d:'2026/11/03',items:[
+  '情境學院全面換成新版畫面：深夜公寓火災與四個急救現場（燙傷、割傷、路邊倒下 CPR＋AED、噎住）都改用新的寫實場景、真實手部模型與新介面（上方階段標籤、限時題目條、選完的回饋卡、知識補充）。',
+  '人物動作改成「人帶著手動」：手臂長度固定、手肘自然彎，手不會拉長或穿過身體；伸不到會前傾、要走過去的地方會真的走過去。',
+  '急救現場四個情境保留「幸福里 7 號樓的一晚」連續故事：開始前會顯示前面章節成績與社區信任，結算後可直接按「下一章」。',
+  '求生現場拿掉舊的「夜間臥室」，由「深夜公寓火災」取代。',
+  '需重新上傳到前台（和 index.html 同一層）：scene-apartment.html、scene-burn.html、scene-bleed.html、scene-cpr.html、scene-choke.html。scene-bedroom.html 不再使用，可以刪除。']},
+ {v:'v11.48',d:'2026/11/01',items:[
+  '每個情境開始前新增「情境提要」：用大字、分成「現在」「你要做」「怎麼玩」三塊，先說現在發生什麼事、等一下要做什麼，再開始。六個場景都有（燙傷、割傷、路邊倒下、噎住、夜間臥室、深夜公寓火災），需重新上傳六個場景檔到前台。',
+  '深夜公寓火災的移動方式加強：提要裡有操作圖示（左半邊拖曳＝走動、右半邊拖曳＝轉視角；電腦 WASD、滑鼠拖曳、E），進遊戲後有三步教學（走動→轉視角→互動），手機左下角會出現走動圈提示，可以按「略過」，學過一次之後不再出現。',
+  '修正手機窄螢幕上方設定鈕被切掉的問題。']},
+ {v:'v11.47',d:'2026/11/01',items:[
+  '改名：首頁磁磚「求生現場」改成「情境學院」。點進去先分成兩區：「急救現場」（燙傷、割傷、路邊 CPR、噎住四部曲）和「求生現場」（火災、地震等自身逃生情境，目前有夜間臥室）。',
+  '新增「深夜公寓火災（新版試玩）」放在求生現場：第一人稱可以自己走動（手機左半邊搖桿、右半邊轉視角；電腦 WASD），靠近物件會出現提示，按「互動」或 E。內有暫停鍵、音量、劇情時間說明、電腦版可關閉、成績單滿版。要上傳新檔 scene-apartment.html 到前台。',
+  '四個急救場景開頭的標題改成「急救現場」，需要重新上傳四個場景檔（scene-burn、scene-bleed、scene-cpr、scene-choke）到前台。',
+  '後台「學員首頁」設定與提示文字同步改叫「情境學院」；Firestore 裡存的舊磁磚名稱也會自動換成新名稱，不用手動改。']},
+ {v:'v11.46',d:'2026/10/31',items:[
+  '測驗與題庫挑戰新增題目動畫：題目用打字機逐字出現（點一下題目可直接跳過），打完選項才依序淡入。',
+  '選中的選項會換成亮色邊框、左側色條，字母變成實心圓、文字放大並輕彈一下；沒選的選項變淡，一眼看出選了哪個。「減少動態」開啟時不做動畫。']},
  {v:'v11.46',d:'2026/10/31',items:[
   '求生現場題目動畫：題目用打字機效果逐字出現，打完選項才依序淡入，選項出現後才開始倒數；點選的選項會變橘色、字放大，沒選的變暗縮小；點題目可以直接看完整題。',
   '預防「成績單上下滑不動」：成績單改成只有一層捲動區，結算時放開畫面的觸控綁定（電腦模擬測不出問題，請在 iPad 上實測確認）。',
@@ -11472,9 +11534,39 @@ function wnCheck(){
       first?'這台裝置第一次顯示，先列出最近的版本。':'從你上次看過的 '+seenS+' 到 '+APP_VERSION.split('　')[0]+'，共 '+list.length+' 版。',seen);
   })();
 }
+/* ===== v11.46 題目動畫：題目打字機、選項依序淡入（測驗與題庫挑戰共用）===== */
+(function(){
+  var TW={t:0,key:'',fin:null};
+  function reduced(){try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches||document.body.classList.contains('editing')}catch(e){return false}}
+  function reveal(opts){opts.forEach(function(o,i){o.style.setProperty('--d',(i*90)+'ms');o.classList.remove('tw-hide');o.classList.add('tw-in')})}
+  function run(qEl,opts,key,skip){
+    clearInterval(TW.t);TW.fin=null;
+    TW.key=key;
+    var full=qEl.textContent;qEl.setAttribute('aria-label',full);
+    if(skip||reduced()||!full)return;
+    var ch=Array.from(full),step=Math.max(1,Math.ceil(ch.length/55)),n=0;
+    qEl.style.minHeight=qEl.offsetHeight+'px';qEl.textContent='';qEl.classList.add('tw-typing');
+    opts.forEach(function(o){o.classList.add('tw-hide')});
+    function done(){clearInterval(TW.t);TW.fin=null;qEl.textContent=full;qEl.classList.remove('tw-typing');qEl.style.minHeight='';reveal(opts)}
+    TW.fin=done;qEl.onclick=function(){if(TW.fin)TW.fin()};
+    TW.t=setInterval(function(){n=Math.min(ch.length,n+step);qEl.textContent=ch.slice(0,n).join('');if(n>=ch.length)done()},30);
+  }
+  var _rq=renderQ;
+  renderQ=function(){
+    var r=_rq.apply(this,arguments);
+    try{var q=$('#qtext'),bx=$('#qopts');if(q&&bx){q.classList.remove('qswap');bx.classList.remove('qswap');
+      run(q,[].slice.call(bx.querySelectorAll('.opt')),'Q'+QMODE+':'+qi+':'+q.textContent,answers[qi]!=null)}}catch(e){}
+    return r;
+  };
+  var _rc=renderChallenge;
+  renderChallenge=function(){
+    var r=_rc.apply(this,arguments);
+    try{if(CH.step==='run'){var q=$('#chBody .ch-q');if(q)run(q,[].slice.call(document.querySelectorAll('#chBody .ch-opts .opt')),'C'+CH.tp+':'+CH.i+':'+q.textContent,CH.ans[CH.i]!=null)}else{TW.key='';clearInterval(TW.t)}}catch(e){}
+    return r;
+  };
+})();
 try{bootFromCache()}catch(e){console.warn('開頁',e);document.documentElement.classList.remove('pre')}
 })();
-
 </script>
 
 <!-- ================= Firebase ================= -->
