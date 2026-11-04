@@ -3665,7 +3665,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.50　2026/11/04';
+var APP_VERSION='v11.51　2026/11/04';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4363,6 +4363,8 @@ function chOnClose(st){
 var GM_CFG={mode:'soon',at:0,end:0,note:''};
 var GM_GAMES=[
  {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。第一人稱，可以自己走動、查看、動手。',file:'scene-apartment.html',ready:true},
+ {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，桌上充電中的行動電源鼓了起來、開始冒煙。斷電、滅火、撤離、報案。',file:'scene-pbank.html',ready:true},
+ {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'下班回家一開門，滿屋子瓦斯味。不碰開關、關瓦斯、開窗、到戶外再報案。',file:'scene-gas.html',ready:true},
  {id:'quake',k:'地震',t:'凌晨搖晃',d:'03:12，整棟樓劇烈搖晃。',ready:false},
  {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
  {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
@@ -4441,7 +4443,7 @@ function paintScene(){
     h+='<button type="button" class="sc-bk" data-sccat="">‹ 情境學院</button><div class="sc-ch">'+SC_CATS.aid.t+'</div>';
     h+='<div class="sc-sec">幸福里 7 號樓的一晚　連續故事　'+dn+' / '+aid.length+' 章<button type="button" class="sc-rs" data-scday-reset="1"'+(dn?'':' hidden')+'>重新開始這一晚</button></div><p class="sc-sub">同一個傍晚，同一棟樓。照順序玩，前面章節拿到 A 級以上，後面每個決定會多幾秒思考時間。</p>'+aid.map(card).join('');
   }else{
-    h+='<button type="button" class="sc-bk" data-sccat="">‹ 情境學院</button><div class="sc-ch">'+SC_CATS.surv.t+'</div><p class="sc-sub">自己就在現場。靠近物件會出現提示，需要判斷時會有選項。</p>'+surv.map(card).join('');
+    h+='<button type="button" class="sc-bk" data-sccat="">‹ 情境學院</button><div class="sc-ch">'+SC_CATS.surv.t+'</div><p class="sc-sub">自己就在現場。有的情境可以自己走動、查看；有的跟著劇情走，輪到你時做決定。</p>'+surv.map(card).join('');
   }
   box.innerHTML=h;
 }
@@ -11407,6 +11409,10 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.51',d:'2026/11/04',items:[
+  '情境學院「求生現場」新增兩個情境：「行動電源冒煙起火」（斷電、用大量的水降溫、滅火後通風撤離、打 119 先講地址）與「瓦斯外洩」（不碰任何開關、關爐具與總開關、輕推開窗、到戶外再報案、敲門不按電鈴）。各 4 個限時決定，加上現場追問，題庫各 8 題。',
+  '求生現場的成績單改成「SURVIVAL REPORT」，評語、狀態條改用「安全值」；玩過的求生情境，在列表上也會顯示你的成績。',
+  '需重新上傳到前台（和 index.html 同一層）：新增 scene-pbank.html、scene-gas.html；另外 scene-burn.html、scene-bleed.html、scene-cpr.html、scene-choke.html 也要重新上傳（共用程式更新）。']},
  {v:'v11.50',d:'2026/11/04',items:[
   '情境學院（電腦版）：劇情字幕移到畫面正下方中間、字放大；題目與回饋視窗加大，內容不用再捲動，也不會擋住主要畫面。',
   '深夜公寓火災：試門溫改成「用手背摸房門上方門縫」，新增「摸門把」的錯誤選項（門把離熱煙層遠，摸起來可能不燙）；原本的「塞門縫」改成新決定「讓房裡的煙排出去」：先確認房門關好再開窗，先開窗再開門會變成洩壓口、把走廊的熱煙抽進來。',
