@@ -3665,7 +3665,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.52　2026/11/04';
+var APP_VERSION='v11.55　2026/11/05';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4362,16 +4362,16 @@ function chOnClose(st){
    「學員端預覽」裡可以進去測試（一般學員與正式學員端仍鎖定）。遊戲本體是獨立檔案（scene-apartment / scene-cpr / scene-choke / scene-bleed / scene-burn .html），放在前台網站同一層。 */
 var GM_CFG={mode:'soon',at:0,end:0,note:''};
 var GM_GAMES=[
- {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。第一人稱，可以自己走動、查看、動手。',file:'scene-apartment.html',ready:true},
- {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，桌上充電中的行動電源鼓了起來、開始冒煙。斷電、滅火、撤離、報案。',file:'scene-pbank.html',ready:true},
- {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'下班回家一開門，滿屋子瓦斯味。不碰開關、關瓦斯、開窗、到戶外再報案。',file:'scene-gas.html',ready:true},
- {id:'quake',k:'地震',t:'地震：晚餐時的搖晃',d:'晚上在家吃飯，整棟樓劇烈搖晃。趴下掩護、穩住，搖晃後關火、疏散、報平安。',file:'scene-quake.html',ready:true},
+ {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。親手確認門外、和 119 一問一答、會下降的煙層與低姿勢、每章圖解、細項成績單。',file:'scene-apartment.html',ready:true},
+ {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，鐵桌上充電中的行動電源冒煙、爆裂起火。斷電退開、不靠近滅火、關門撤離、報案、跟消防隊交接。',file:'scene-pbank.html',ready:true},
+ {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'在家時瓦斯偵測器響了，聞到一點瓦斯味。剛漏才止洩、不碰開關、開窗、到戶外再報案；大外洩直接離開。',file:'scene-gas.html',ready:true},
+ {id:'quake',k:'地震',t:'地震：晚餐時的搖晃',d:'晚上在家吃飯，整棟樓劇烈搖晃。趴下掩護、穩住，搖晃後瓦斯大外洩就直接離開、走樓梯疏散、報平安。',file:'scene-quake.html',ready:true},
  {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
  {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
- {id:'pan',k:'火災',t:'廚房油鍋起火',d:'煎魚時鍋裡的油燒了起來。關火蓋鍋蓋、不掀蓋、滅火器、滅不了就逃。',file:'scene-pan.html',ready:true},
+ {id:'pan',k:'火災',t:'廚房油鍋起火',d:'煎魚時鍋裡的油剛燒起來。先蓋鍋蓋再關火、靜置 3 到 5 分鐘、蓋不住用滅火器、通風等冷卻。',file:'scene-pan.html',ready:true},
  {id:'mall',k:'火災',t:'百貨公司的火警',d:'5 樓逛街時警報大響，走道開始有煙。指示燈、防火門、樓梯見煙、出來不回頭。',file:'scene-mall.html',ready:true},
  {id:'co',k:'一氧化碳',t:'浴室熱水器：一氧化碳',d:'洗澡洗到一半頭痛、想吐。停用、通風、離開、從源頭改善熱水器。',file:'scene-co.html',ready:true},
- {id:'flood',k:'淹水',t:'颱風夜的地下停車場',d:'地下二樓開始淹水。人先走、避開配電箱、教鄰居敲車窗四角、上去就不再下去。',file:'scene-flood.html',ready:true},
+ {id:'cord',k:'火災',t:'延長線走火',d:'客廳延長線插滿大電器，插頭冒煙起火。先斷電、用滅火器、燒過的插座不再通電、改正用電習慣。',file:'scene-cord.html',ready:true},
  {id:'bleed',day:2,clock:'18:05',k:'急救',t:'廚房割傷',d:'傷口一直流血，止不住。直接加壓與包紮。',file:'scene-bleed.html',ready:true},
  {id:'burn',day:1,clock:'17:48',k:'急救',t:'熱水燙傷',d:'小孩被熱水燙到了。沖脫泡蓋送。',file:'scene-burn.html',ready:true}
 ];
@@ -4418,7 +4418,7 @@ function gmDay(){try{return JSON.parse(localStorage.getItem('iw-day')||'{}')||{}
 function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready','slow');clearTimeout(window._gmT);window._gmT=setTimeout(function(){if(!bx.hidden&&!bx.classList.contains('ready'))bx.classList.add('slow')},12000);fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
 var SC_CAT='';
 var SC_CATS={aid:{k:'FIRST AID',t:'急救現場',d:'身邊的人受傷、倒下、噎住的那一刻。四個連續的急救情境，學會第一時間該做什麼。'},
-             surv:{k:'SURVIVAL',t:'求生現場',d:'火災、地震、一氧化碳、淹水。自己就在現場，要先保護自己、再想辦法離開。'}};
+             surv:{k:'SURVIVAL',t:'求生現場',d:'火災、瓦斯、地震、一氧化碳。自己就在現場，要先保護自己、再想辦法離開。'}};
 function paintScene(){
   var box=$('#sceneList');if(!box)return;
   var st=gmState(),h='',D=gmDay();if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
@@ -11409,6 +11409,26 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.55',d:'2026/11/05',items:[
+  '行動電源：改成鋰電池熱失控的真實樣子，起火後會隔幾秒就爆裂一次、火花噴濺到地上。題目改成不靠近滅火：先斷電退開，起火後叫家人一起離開並把門帶上，到門外報案，最後跟到場的消防員交接（起火物、位置、人都出來了沒）。行動電源放在不會燒的鐵桌上，能量釋放完就自己熄了。',
+  '瓦斯外洩：情境改成「人在家、瓦斯偵測器剛響、只聞到一點味道」，這種剛開始外洩的情況才去關瓦斯、開窗。另外補上大外洩（一進門就很濃、不知道漏多久）要直接離開、不要止洩的觀念（知識卡、現場追問）。',
+  '地震：搖晃後改成湯鍋翻倒把爐火澆熄、瓦斯大量外洩，正確做法是穿鞋、什麼開關都不碰、背避難包直接離開；走進去關瓦斯改成錯誤選項並說明靜電引爆的風險。',
+  '油鍋：火改成剛冒出鍋緣的小火，順序改成先蓋鍋蓋、再關爐火，蓋上後靜置 3 到 5 分鐘才可以移動或掀蓋；鍋蓋蓋不密時改用滅火器；最後是通風、等冷卻。另外說明火已經很大時不能靠近蓋鍋蓋。',
+  '百貨公司：走道重新製作，加上拋光石材地板、輕鋼架天花板與嵌燈、偵煙器、灑水頭，店面改成通透玻璃與窄框、門楣招牌、店內打光的層架、衣架、模特兒，走道有柱子、消防栓箱、滅火器、長椅、盆栽、樓層指南。出口標示燈照實體重畫（綠底白色奔跑人形與門），避難方向指示燈改成白底綠圖加箭頭，裝在柱子低處與天花板吊掛。',
+  '一氧化碳：修正開門後擋住畫面的浴室門（改成往浴室內開）。離開浴室後改成開窗、離開家，到門外通風處再打 119；弟弟出來時也叫他先一起出來。',
+  '颱風夜地下停車場下架，換成新情境「延長線走火」：插頭冒煙先斷電（不能用水）、延長線起火用滅火器（不用毛毯拍、不用腳踩）、燒過的插座不再通電並請消防人員確認、之後大電器直接插牆上插座。',
+  '需重新上傳到前台（和 index.html 同一層）：scene-pbank.html、scene-gas.html、scene-quake.html、scene-pan.html、scene-mall.html、scene-co.html；新增 scene-cord.html。scene-flood.html 不再使用，可以刪除。']},
+ {v:'v11.54',d:'2026/11/04',items:[
+  '「深夜公寓火災」正式換成精緻版（原本的「精緻版試玩」入口拿掉，只留一個）。',
+  '其他 11 個情境（熱水燙傷、廚房割傷、路邊倒下的人、餐桌上的噎住、行動電源起火、瓦斯外洩、油鍋起火、地震、一氧化碳、百貨公司火災、地下室淹水）全部套用精緻版的共用設計：每一題的詳解卡會列出你的選擇、花了幾秒、得分和比較好的做法，可以切換「知識補充／看流程圖解」（流程圖會標出這一題是第幾步）；選完畫面上會跳出得分。',
+  '每個情境新增「流程排序」關卡：做完限時決定後，把正確流程依序點出來，點錯可以取消重排，結束有對照。',
+  '成績單改成細項評分：總分＝判斷正確 60%＋安全值（傷者狀況）20%＋流程排序 10%＋反應速度 10%（沒開倒數就不算速度），加上能力分析長條、含時間的處置時間軸（每一題可以展開圖解與重點）、評等標準。拖曳轉頭也加了緩衝，比較順。',
+  '需重新上傳到前台（和 index.html 同一層）：scene-apartment.html、scene-burn.html、scene-bleed.html、scene-cpr.html、scene-choke.html、scene-pbank.html、scene-gas.html、scene-pan.html、scene-quake.html、scene-co.html、scene-mall.html、scene-flood.html。scene-apartment-v2.html 不再使用，可以刪除。']},
+ {v:'v11.53',d:'2026/11/04',items:[
+  '求生現場新增「深夜公寓火災（精緻版試玩）」，和原本的版本並排，方便比較。新版的差別：開門前要自己點選把手背放在哪裡（上方門縫、門板中間、門把、下方門縫），摸到的溫度會影響下一步；報案改成和 119 一問一答（地址、位置與人數），再回覆室友；排煙改成依序選兩個動作的排序題。',
+  '新版加入會一直往下降的煙層：右側量表顯示煙層高度，頭進到煙裡會咳嗽、扣安全值，可以按「低姿勢」（電腦 C 鍵）壓低身體。等待救援時要左右拖曳畫面揮動手電筒。',
+  '新版每一章結束有詳解卡：逐步列出你的選擇、得分、正解，可以切換「知識補充／看圖解」。成績單改成細項分析（判斷正確、煙霧防護、反應速度、通報完整）、這一晚的時間軸與評等標準。視角轉動與走動也加了緩衝，手感比較順。',
+  '需上傳到前台（和 index.html 同一層）：新增 scene-apartment-v2.html。']},
  {v:'v11.52',d:'2026/11/04',items:[
   '情境學院「求生現場」五個情境全部開放：「地震：晚餐時的搖晃」、「廚房油鍋起火」、「百貨公司的火警」、「浴室熱水器：一氧化碳」、「颱風夜的地下停車場」。每個情境 4 個限時決定、選錯有後果動畫，加上 8 題現場追問題庫；求生現場現在共 8 個情境。',
   '回饋卡的「繼續下一關」按鈕重新設計：改成米白色實心按鈕、右側深色箭頭方塊，和整體介面更一致。',
