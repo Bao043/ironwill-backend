@@ -3665,7 +3665,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.55　2026/11/05';
+var APP_VERSION='v11.56　2026/11/08';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4362,16 +4362,17 @@ function chOnClose(st){
    「學員端預覽」裡可以進去測試（一般學員與正式學員端仍鎖定）。遊戲本體是獨立檔案（scene-apartment / scene-cpr / scene-choke / scene-bleed / scene-burn .html），放在前台網站同一層。 */
 var GM_CFG={mode:'soon',at:0,end:0,note:''};
 var GM_GAMES=[
- {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。親手確認門外、和 119 一問一答、會下降的煙層與低姿勢、每章圖解、細項成績單。',file:'scene-apartment.html',ready:true},
- {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，鐵桌上充電中的行動電源冒煙、爆裂起火。斷電退開、不靠近滅火、關門撤離、報案、跟消防隊交接。',file:'scene-pbank.html',ready:true},
- {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'在家時瓦斯偵測器響了，聞到一點瓦斯味。剛漏才止洩、不碰開關、開窗、到戶外再報案；大外洩直接離開。',file:'scene-gas.html',ready:true},
+ {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。先大聲通知室友、親手確認門外、和 119 一問一答、會下降的煙層與低姿勢、每章圖解、細項成績單。',file:'scene-apartment.html',ready:true},
+ {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，充電中的行動電源快速膨脹、冒出大量白煙（熱失控）。不靠近拔插頭、叫家人關門撤離、報案、交接，再學會怎麼買、怎麼充。',file:'scene-pbank.html',ready:true},
+ {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'在家時瓦斯偵測器響了，聞到一點瓦斯味。剛漏才止洩、不碰開關、開窗、到戶外再報案；瓦斯會讓人缺氧（單純性窒息），大外洩直接離開。',file:'scene-gas.html',ready:true},
  {id:'quake',k:'地震',t:'地震：晚餐時的搖晃',d:'晚上在家吃飯，整棟樓劇烈搖晃。趴下掩護、穩住，搖晃後瓦斯大外洩就直接離開、走樓梯疏散、報平安。',file:'scene-quake.html',ready:true},
  {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
- {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。拍背與腹部擠壓。',file:'scene-choke.html',ready:true},
- {id:'pan',k:'火災',t:'廚房油鍋起火',d:'煎魚時鍋裡的油剛燒起來。先蓋鍋蓋再關火、靜置 3 到 5 分鐘、蓋不住用滅火器、通風等冷卻。',file:'scene-pan.html',ready:true},
- {id:'mall',k:'火災',t:'百貨公司的火警',d:'5 樓逛街時警報大響，走道開始有煙。指示燈、防火門、樓梯見煙、出來不回頭。',file:'scene-mall.html',ready:true},
- {id:'co',k:'一氧化碳',t:'浴室熱水器：一氧化碳',d:'洗澡洗到一半頭痛、想吐。停用、通風、離開、從源頭改善熱水器。',file:'scene-co.html',ready:true},
- {id:'cord',k:'火災',t:'延長線走火',d:'客廳延長線插滿大電器，插頭冒煙起火。先斷電、用滅火器、燒過的插座不再通電、改正用電習慣。',file:'scene-cord.html',ready:true},
+ {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。背脊腹挫法：身體前傾，5 次拍背＋5 次腹部推壓，重複到排出。',file:'scene-choke.html',ready:true},
+ {id:'pan',k:'火災',t:'廚房油鍋起火',d:'煎魚時鍋裡的油剛燒起來。先喊家人、8 到 10 秒內蓋上相同尺寸的鍋蓋再關火；火太大時用住宅用強化液滅火器（乾粉、二氧化碳不適合油鍋火）。',file:'scene-pan.html',ready:true},
+ {id:'mall',k:'火災',t:'百貨公司的火警',d:'5 樓逛街時警報大響，走道開始有煙。先叫同伴、看指示燈、防火門、樓梯見煙、出來不回頭。',file:'scene-mall.html',ready:true},
+ {id:'co',k:'一氧化碳',t:'浴室熱水器：一氧化碳',d:'洗澡洗到一半頭痛、想吐。開窗、離開家並把門帶上、到戶外空曠處再報案、不重返，從源頭改善熱水器。',file:'scene-co.html',ready:true},
+ {id:'cord',k:'火災',t:'延長線走火',d:'客廳延長線插滿大電器，插頭冒煙起火。先喊家人、斷電，滅火器從 5 公尺外開始噴、邊噴邊前進，燒過的插座不再通電。',file:'scene-cord.html',ready:true},
+ {id:'equip',k:'居家',t:'居家消防器材：裝在哪裡？',d:'在家裡的平面圖上親手擺放：滅火器放哪、每個房間的住警器選哪一種、裝在哪個位置、瓦斯偵測器的高度、一氧化碳警報器的位置。',file:'scene-equip.html',ready:true},
  {id:'bleed',day:2,clock:'18:05',k:'急救',t:'廚房割傷',d:'傷口一直流血，止不住。直接加壓與包紮。',file:'scene-bleed.html',ready:true},
  {id:'burn',day:1,clock:'17:48',k:'急救',t:'熱水燙傷',d:'小孩被熱水燙到了。沖脫泡蓋送。',file:'scene-burn.html',ready:true}
 ];
@@ -4418,7 +4419,7 @@ function gmDay(){try{return JSON.parse(localStorage.getItem('iw-day')||'{}')||{}
 function gmOpen(g){var fr=$('#sceneFrame'),bx=$('#sceneBox');if(!g||!g.file||!fr||!bx)return;bx.classList.remove('ready','slow');clearTimeout(window._gmT);window._gmT=setTimeout(function(){if(!bx.hidden&&!bx.classList.contains('ready'))bx.classList.add('slow')},12000);fr.setAttribute('allow','autoplay; fullscreen');fr.src=(typeof FRONT_URL==='string'?FRONT_URL:'')+g.file+'?v='+Date.now();bx.hidden=false;try{if(bx.requestFullscreen)bx.requestFullscreen().catch(function(){})}catch(err){}}
 var SC_CAT='';
 var SC_CATS={aid:{k:'FIRST AID',t:'急救現場',d:'身邊的人受傷、倒下、噎住的那一刻。四個連續的急救情境，學會第一時間該做什麼。'},
-             surv:{k:'SURVIVAL',t:'求生現場',d:'火災、瓦斯、地震、一氧化碳。自己就在現場，要先保護自己、再想辦法離開。'}};
+             surv:{k:'SURVIVAL',t:'求生現場',d:'火災、瓦斯、地震、一氧化碳，還有家裡的消防器材怎麼裝。自己就在現場，要先保護自己、再想辦法離開。'}};
 function paintScene(){
   var box=$('#sceneList');if(!box)return;
   var st=gmState(),h='',D=gmDay();if(PREVIEW&&!st.open)h+='<div class="sc-test">預覽測試：一般學員目前看到的是「'+hmEsc(st.badge||'未開放')+'」，進不來這一頁。</div>';
@@ -11409,6 +11410,20 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.56',d:'2026/11/08',items:[
+  '全部情境：字幕改成「讀完才換下一句」。每句字幕依字數至少停留約 1 到 6.5 秒，前一句還沒讀完時，劇情會先停下來等，不會一閃而過。',
+  '流程排序：加上引導。上方先說明現在的情境，並提示「現在請點：第幾步（共幾步）」、要接在哪一步之後；下方的格子會顯示已經排好的步驟。',
+  '所有火災情境改成先通報：不管火大火小，先叫家人、室友、同伴，再滅火、逃生、報案。公寓新增「先大聲通知室友」一步；油鍋、延長線、行動電源、百貨公司都已調整。',
+  'CPR：拍影片的路人改成雙手拿手機在胸前，手機不會再穿過頭；AED 兩片貼片的電線改成各自接到 AED 插頭，不再兩片互相連在一起，左側那片的線從肚子繞過、不經過壓胸的位置；救護車到時圍觀的人改成「拍影片的人收起手機站開、另一位朝救護車揮手引導、店員跪在旁邊顧著 AED」；修正進入流程排序與現場追問時，壓胸的手臂看起來斷成一節的問題。另修正 v11.54 到 v11.55 版 CPR 病人不見的問題。',
+  '異物梗塞：改成消防署最新的「背脊腹挫法」（取代舊稱哈姆立克法）：讓對方身體前傾，5 次拍背＋5 次腹部推壓，交替重複到異物排出；嬰兒是 5 次拍背＋5 次胸部按壓；失去意識立刻打 119 並開始 CPR。新增「重複到排出」的決策、流程與追問題。',
+  '行動電源：改成「快速膨脹＋大量白煙」的熱失控，正確做法改成退開、不靠近拔插頭（靠近拔插頭改為錯誤選項），叫家人一起離開並關門。新增第 5 段「隔天：怎麼買、怎麼充」：買有 BSMI 商品檢驗標識的知名品牌、不在睡覺或出門時充電、放在不會燒的桌面（例如鐵桌）上充、周圍不堆雜物。',
+  '瓦斯：補充瓦斯本身不像一氧化碳有毒，但外洩會讓空氣中的氧氣變少，造成「單純性窒息」；症狀由輕到重是頭痛、頭暈、疲倦、心跳加快、呼吸困難、噁心嘔吐（知識卡與追問題）。',
+  '滅火器（延長線、油鍋）：乾粉滅火器從離火約 5 公尺處開始噴，感覺火勢被壓住再邊噴邊前進，背對出口、保留退路（先懂火再滅火）。動畫、題目、說明一起修正。',
+  '油鍋：起火後 8 到 10 秒內要蓋上，而且鍋蓋要和鍋子一樣大（鍋蓋改成正確蓋在鍋上）；蓋之前先叫家人。新增第 3 段「火太大的時候」：住宅用強化液滅火器可以撲滅油鍋火，乾粉、二氧化碳不適合，家裡建議買強化液；滅火器改放在大門旁。',
+  '一氧化碳：不要站在家門口打 119（一氧化碳會從門口飄出來），改成開窗、離開家並把門帶上，到戶外空曠處再報案；新增第 3 段「不重返」（弟弟想回去拿手機）與戶外場景。',
+  '百貨公司：往出口走之前，先叫試衣間裡的同伴。',
+  '新遊戲「居家消防器材：裝在哪裡？」（求生現場）：滅火器放在家中大門附近；每個居室都要裝住警器，廚房用定溫式、其他用偵煙式（含「只有臥室裝一顆」的延遲示範）；住警器裝在天花板中央；瓦斯偵測器依瓦斯種類決定高度（天然氣靠天花板、桶裝瓦斯靠地板）並一直插電；一氧化碳警報器裝在臥室附近的走廊或客廳天花板。瓦斯偵測器與爐具的法規距離標示「待對照官方原文」。',
+  '需重新上傳到前台（和 index.html 同一層）：scene-apartment.html、scene-burn.html、scene-bleed.html、scene-cpr.html、scene-choke.html、scene-pbank.html、scene-gas.html、scene-quake.html、scene-pan.html、scene-mall.html、scene-co.html、scene-cord.html；新增 scene-equip.html。']},
  {v:'v11.55',d:'2026/11/05',items:[
   '行動電源：改成鋰電池熱失控的真實樣子，起火後會隔幾秒就爆裂一次、火花噴濺到地上。題目改成不靠近滅火：先斷電退開，起火後叫家人一起離開並把門帶上，到門外報案，最後跟到場的消防員交接（起火物、位置、人都出來了沒）。行動電源放在不會燒的鐵桌上，能量釋放完就自己熄了。',
   '瓦斯外洩：情境改成「人在家、瓦斯偵測器剛響、只聞到一點味道」，這種剛開始外洩的情況才去關瓦斯、開窗。另外補上大外洩（一進門就很濃、不知道漏多久）要直接離開、不要止洩的觀念（知識卡、現場追問）。',
