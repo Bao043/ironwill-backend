@@ -856,6 +856,13 @@ body.dirty #z-pro{padding-bottom:80px}
 #sceneClose{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);height:36px;padding:0 16px;background:rgba(0,0,0,.62);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:99px;font-size:14px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);white-space:nowrap}
 #sceneBox.ready #sceneClose{display:none}
 .gm-adm .f-in{width:100%}
+.gm-adm .ch-trow .f-in{width:auto}
+.gm-gh{display:flex;justify-content:space-between;align-items:baseline;margin:14px 0 4px;font-size:calc(13px*var(--fs));color:var(--ink);font-weight:600;letter-spacing:.04em}
+.gm-gh span{font-family:var(--mono);font-weight:400;font-size:calc(11.5px*var(--fs));color:var(--muted)}
+.gm-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.gm-row .gm-k{flex:none;min-width:58px;padding:2px 8px;border:1px solid var(--line);border-radius:99px;font-size:calc(11.5px*var(--fs));color:var(--muted);text-align:center}
+.gm-row .gm-t{flex:1;min-width:0;font-size:calc(14px*var(--fs))}
+.gm-row .gm-t em{display:block;font-style:normal;font-family:var(--mono);font-size:calc(11px*var(--fs));color:var(--muted)}
 .tile.tile-lock svg,.tile.tile-lock .tile-t{opacity:.35}
 .tile.tile-lock:hover svg{transform:none}
 .tile.tile-lock::after{display:none}
@@ -3080,6 +3087,7 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     <div class="td-box" data-tds="live">
       <div class="td-row" data-atab-go="inbox"><span class="td-rt">收件匣<em id="tdInboxD">悄悄話 <b id="kpiW" data-jump="w">—</b>．待回邀約 <b id="kpiInv" data-jump="i">—</b></em></span><span class="td-pill" id="tdInboxPill" hidden></span><span id="inboxCount" hidden></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="bank:challenge"><span class="td-rt">挑戰題庫<em id="tdChD">—</em></span><span class="td-pill" id="tdChPill" hidden></span><span class="td-go">›</span></div>
+      <div class="td-row" data-atab-go="bank:grp-scene"><span class="td-rt">情境學院<em id="tdGmD">—</em></span><span class="td-pill" id="tdGmPill" hidden></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="settings:grp-traffic"><span class="td-rt">瀏覽流量<em>各頁真實點閱次數</em></span><span class="td-go">›</span></div>
       <div class="td-row" data-atab-go="content:grp-home"><span class="td-rt">學員首頁<em>功能磁磚開關、品牌圖、編輯學員畫面</em></span><span class="td-go">›</span></div>
     </div>
@@ -3117,8 +3125,8 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     </div>
   </section>
   <section class="atab" id="at-bank" data-tab="bank">
-    <div class="at-head"><div class="meta">題庫</div><h1 class="display">題目都在這裡</h1></div>
-    <div class="seg bk-seg" id="bankSeg"><button type="button" class="on" data-bk="grp-quiz">上課測驗</button><button type="button" data-bk="grp-challenge">挑戰題庫</button></div>
+    <div class="at-head"><div class="meta">題庫</div><h1 class="display">題目與練習</h1></div>
+    <div class="seg bk-seg" id="bankSeg"><button type="button" class="on" data-bk="grp-quiz">上課測驗</button><button type="button" data-bk="grp-challenge">挑戰題庫</button><button type="button" data-bk="grp-scene">情境學院</button></div>
     <div class="bk-wrap">
   <div class="grp" id="grp-quiz"><div class="grp-h"><span class="grp-t">題庫與測驗</span><span class="grp-m" id="qTag"></span><span class="grp-c">›</span></div>
   <div class="grp-b">
@@ -3154,6 +3162,12 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     <p class="sub">給學員和民眾自己練習的題庫，跟上課的課前、課後測驗分開。分「消防安全」「急救教育」兩個主題，每次隨機抽 10 題。</p>
     <div id="chAdmin"></div>
     <button class="btn btn-quiet" data-save="chbank">儲存挑戰題庫</button>
+  </div></div>
+
+  <div class="grp" id="grp-scene"><div class="grp-h"><span class="grp-t">情境學院</span><span class="grp-m" id="gmTag"></span><span class="grp-c">›</span></div>
+  <div class="grp-b">
+    <p class="sub">給學員和民眾自己玩的情境遊戲，分「急救現場」「求生現場」兩區。跟挑戰題庫一樣，在這裡決定開不開放、什麼時候開。</p>
+    <div id="gmAdmin" class="gm-adm"></div>
   </div></div>
 
     </div>
@@ -3291,7 +3305,6 @@ window.addEventListener('unhandledrejection',function(e){console.warn('未處理
     <div class="section-head"><h2>功能磁磚</h2><span>開關後按全部儲存</span></div>
     <p class="sub">關掉的磁磚學員看不到。「講師介紹」關掉時，首頁的講師名牌也會收起來；「上課專區」裡已經包含課程回饋。要改名、排順序請到編輯學員畫面。</p>
     <div id="homeTiles"></div>
-    <div id="gmAdmin" class="gm-adm"></div>
     <div class="f" style="padding-top:14px"><div class="f-q">首頁品牌圖位置</div>
       <div class="f-hint">學員首頁的 IRON WILL 主視覺要放哪裡。</div>
       <div class="chips" data-one id="homePos" style="margin-top:8px">
@@ -3665,7 +3678,7 @@ function watchCourse(){
   },function(e){console.warn('課程設定同步失敗',e);unsubC=null;setTimeout(function(){try{watchCourse()}catch(x){}},3000);});
 }
 /* ---- 深淺色 ---- */
-var APP_VERSION='v11.56　2026/11/08';
+var APP_VERSION='v11.58　2026/11/10';
 (function(){
   var root=document.documentElement;
   function apply(t){
@@ -4365,14 +4378,14 @@ var GM_GAMES=[
  {id:'apt',k:'火災',t:'深夜公寓火災',d:'凌晨 02:13，警報響了，門縫下透著橘紅色的光。先大聲通知室友、親手確認門外、和 119 一問一答、會下降的煙層與低姿勢、每章圖解、細項成績單。',file:'scene-apartment.html',ready:true},
  {id:'pbank',k:'火災',t:'行動電源冒煙起火',d:'深夜，充電中的行動電源快速膨脹、冒出大量白煙（熱失控）。不靠近拔插頭、叫家人關門撤離、報案、交接，再學會怎麼買、怎麼充。',file:'scene-pbank.html',ready:true},
  {id:'gas',k:'瓦斯',t:'瓦斯外洩',d:'在家時瓦斯偵測器響了，聞到一點瓦斯味。剛漏才止洩、不碰開關、開窗、到戶外再報案；瓦斯會讓人缺氧（單純性窒息），大外洩直接離開。',file:'scene-gas.html',ready:true},
- {id:'quake',k:'地震',t:'地震：晚餐時的搖晃',d:'晚上在家吃飯，整棟樓劇烈搖晃。趴下掩護、穩住，搖晃後瓦斯大外洩就直接離開、走樓梯疏散、報平安。',file:'scene-quake.html',ready:true},
+ {id:'quake',k:'地震',t:'地震：晚餐時的搖晃',d:'晚上在家吃飯，整棟樓劇烈搖晃。趴下掩護穩住，停了先穿鞋、拿避難包離開，走樓梯疏散，到家人約好的集合地點，用文字訊息報平安。',file:'scene-quake.html',ready:true},
  {id:'cpr',day:3,clock:'18:12',k:'急救',t:'路邊倒下的人',d:'超商門口，有人突然倒地。CPR 與 AED。',file:'scene-cpr.html',ready:true},
  {id:'choke',day:4,clock:'19:08',k:'急救',t:'餐桌上的噎住',d:'家人吃著吃著，突然說不出話。背脊腹挫法：身體前傾，5 次拍背＋5 次腹部推壓，重複到排出。',file:'scene-choke.html',ready:true},
  {id:'pan',k:'火災',t:'廚房油鍋起火',d:'煎魚時鍋裡的油剛燒起來。先喊家人、8 到 10 秒內蓋上相同尺寸的鍋蓋再關火；火太大時用住宅用強化液滅火器（乾粉、二氧化碳不適合油鍋火）。',file:'scene-pan.html',ready:true},
- {id:'mall',k:'火災',t:'百貨公司的火警',d:'5 樓逛街時警報大響，走道開始有煙。先叫同伴、看指示燈、防火門、樓梯見煙、出來不回頭。',file:'scene-mall.html',ready:true},
- {id:'co',k:'一氧化碳',t:'浴室熱水器：一氧化碳',d:'洗澡洗到一半頭痛、想吐。開窗、離開家並把門帶上、到戶外空曠處再報案、不重返，從源頭改善熱水器。',file:'scene-co.html',ready:true},
- {id:'cord',k:'火災',t:'延長線走火',d:'客廳延長線插滿大電器，插頭冒煙起火。先喊家人、斷電，滅火器從 5 公尺外開始噴、邊噴邊前進，燒過的插座不再通電。',file:'scene-cord.html',ready:true},
- {id:'equip',k:'居家',t:'居家消防器材：裝在哪裡？',d:'在家裡的平面圖上親手擺放：滅火器放哪、每個房間的住警器選哪一種、裝在哪個位置、瓦斯偵測器的高度、一氧化碳警報器的位置。',file:'scene-equip.html',ready:true},
+ {id:'mall',k:'火災',t:'百貨公司的火警',d:'5 樓逛街時警報大響，3 樓發生火警。先叫同伴、看指示燈、手背摸門上方再開防火門、樓梯見煙退回 4 樓換路、出來不回頭。',file:'scene-mall.html',ready:true},
+ {id:'co',k:'一氧化碳',t:'浴室熱水器：一氧化碳',d:'洗澡洗到一半頭痛、想吐。開窗、離開家並把門帶上、到戶外空曠處再報案、不重返；最後看技術士把熱水器移到室外、裝上一氧化碳警報器。',file:'scene-co.html',ready:true},
+ {id:'cord',k:'火災',t:'延長線走火',d:'客廳延長線插滿大電器，插頭冒煙、整條線發燙。先喊家人，不用手拔，到配電箱斷電；滅火器從 5 公尺外開始噴，燒過的延長線不再用。',file:'scene-cord.html',ready:true},
+ {id:'equip',k:'居家',t:'居家消防器材：裝在哪裡？',d:'在家裡的平面圖上親手擺放：滅火器、住警器、瓦斯偵測器、一氧化碳警報器。每一題選完都有動畫，看懂為什麼要這樣裝。',file:'scene-equip.html',ready:true},
  {id:'bleed',day:2,clock:'18:05',k:'急救',t:'廚房割傷',d:'傷口一直流血，止不住。直接加壓與包紮。',file:'scene-bleed.html',ready:true},
  {id:'burn',day:1,clock:'17:48',k:'急救',t:'熱水燙傷',d:'小孩被熱水燙到了。沖脫泡蓋送。',file:'scene-burn.html',ready:true}
 ];
@@ -4483,27 +4496,48 @@ setInterval(function(){
   }
   GM_SIG=sig;
 },1000);
-/* 後台：內容 › 學員首頁 › 情境學院開放設定 */
+/* 後台：題庫 › 情境學院（和挑戰題庫同一套樣式：開放狀態、預約、自動關閉、學員現在看到、情境清單） */
+function gmCount(){var a=GM_GAMES.filter(function(g){return g.ready&&g.day}).length,b=GM_GAMES.filter(function(g){return g.ready&&!g.day}).length;return '急救 '+a+'．求生 '+b+' 個情境'}
 function renderGmAdmin(){
   var box=$('#gmAdmin');if(!box)return;
-  var t=gmTile();if(!t){box.innerHTML='';return;}
-  var m=GM_CFG.mode||'soon',st=gmState();
-  var M=[['soon','開發中'],['open','開放'],['pause','維修中'],['scheduled','預約開放']];
-  var h='<div class="section-head" style="margin-top:22px"><h2>情境學院</h2><span>'+hmEsc(t.on?(st.open?'開放中':st.badge||'關閉'):'已隱藏')+'</span></div>'+
-    '<p class="sub">情境遊戲的開放狀態。學員端會即時跟著變；選「開發中」時學員只看到鎖住的磁磚。你可以到「學員端預覽」按這塊磁磚進去測試，不受狀態影響。</p>'+
-    '<div class="chips" data-one id="gmModes">'+M.map(function(x){return '<span class="chip'+(m===x[0]?' on':'')+'" data-gmmode="'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div>';
+  var t=gmTile(),vis=!!(t&&t.on),m=vis?(GM_CFG.mode||'soon'):'hidden',st=gmState();
+  var tag=$('#gmTag');
+  if(tag)tag.textContent=({open:'開放中',soon:'開發中',pause:'維修中',scheduled:'預約開放',hidden:'隱藏'})[m]+(st.mode==='ended'?'（已結束）':'')+'．'+gmCount();
+  var lab=function(x){return 'font-size:calc(13px*var(--fs));color:var(--muted)'};
+  var h='<div class="section-head" style="padding-top:18px"><h2>學員端狀態</h2><span>按了立刻生效</span></div>'+
+    '<div class="ch-mode">'+[['soon','開發中','磁磚鎖住＋提示'],['open','開放','直接可以玩'],['pause','維修中','磁磚變淡＋提示'],['scheduled','預約開放','時間到自動開'],['hidden','隱藏','首頁看不到']].map(function(x){
+      return '<button type="button" data-gmmode="'+x[0]+'"'+(m===x[0]?' class="on"':'')+'><b>'+x[1]+'</b><span>'+x[2]+'</span></button>'}).join('')+'</div>';
   if(m==='scheduled'){
-    h+='<div class="f" style="padding-top:14px"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">開放時間'+(GM_CFG.at?'　'+hmEsc(chRel(GM_CFG.at)):'')+'</div>'+
-      '<div class="ch-trow"><input class="f-in" type="datetime-local" id="gmAt" value="'+chLocalInput(GM_CFG.at)+'"><button type="button" class="qbtn" data-gmtime="at">儲存時間</button></div></div>';
+    h+='<div class="f"><div class="f-q" style="'+lab()+'">幾月幾號幾點開放<span class="ch-rel">'+hmEsc((chDayWord(GM_CFG.at)?chDayWord(GM_CFG.at)+'．':'')+chRel(GM_CFG.at))+'</span></div>'+
+      '<div class="ch-trow"><input class="f-in" type="datetime-local" id="gmAt" value="'+chLocalInput(GM_CFG.at)+'"><button type="button" class="qbtn" data-gmtime="at">儲存</button></div>'+
+      '<div class="chips ch-quick">'+[['10m','10 分鐘後'],['30m','30 分鐘後'],['60m','1 小時後'],['tm9','明天 09:00']].map(function(x){
+        return '<span class="chip" data-gmquick="at:'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div></div>';
+  }
+  if(m==='soon'||m==='pause'||m==='scheduled'){
+    h+='<div class="f"><div class="f-q" style="'+lab()+'">還沒開放時，學員點下去看到的提示（可留空）</div>'+
+      '<input class="f-in" id="gmNote" maxlength="60" value="'+hmEsc(GM_CFG.note)+'" placeholder="'+(m==='pause'?'例如：維修中，下課後再來':m==='scheduled'?'例如：課程結束後開放':'「情境學院」開發中，敬請期待')+'"></div>';
   }
   if(m==='open'||m==='scheduled'){
-    h+='<div class="f" style="padding-top:14px"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">自動關閉時間（可不設）'+(GM_CFG.end?'　'+hmEsc(chRel(GM_CFG.end)):'')+'</div>'+
-      '<div class="ch-trow"><input class="f-in" type="datetime-local" id="gmEnd" value="'+(GM_CFG.end?chLocalInput(GM_CFG.end):'')+'"><button type="button" class="qbtn" data-gmtime="end">儲存時間</button>'+
-      (GM_CFG.end?'<button type="button" class="qbtn" data-gmtime="clear">不關閉</button>':'')+'</div></div>';
+    var aft=m==='scheduled'&&GM_CFG.at>Date.now();
+    h+='<div class="f"><div class="f-q" style="'+lab()+'">自動關閉時間（可不設）'+(GM_CFG.end?'<span class="ch-rel">'+hmEsc((chDayWord(GM_CFG.end)?chDayWord(GM_CFG.end)+'．':'')+chRel(GM_CFG.end))+'</span>':'')+'</div>'+
+      '<div class="ch-trow"><input class="f-in" type="datetime-local" id="gmEnd" value="'+(GM_CFG.end?chLocalInput(GM_CFG.end):'')+'"><button type="button" class="qbtn" data-gmtime="end">儲存</button>'+
+      (GM_CFG.end?'<button type="button" class="qbtn" data-gmtime="clear">不關閉</button>':'')+'</div>'+
+      '<div class="chips ch-quick">'+[['30m',(aft?'開放後 ':'')+'30 分鐘'],['60m',(aft?'開放後 ':'')+'1 小時'],['120m',(aft?'開放後 ':'')+'2 小時'],['td',(aft&&chDayWord(GM_CFG.at)!=='今天'?'那天':'今天')+' 23:59']].map(function(x){
+        return '<span class="chip" data-gmquick="end:'+x[0]+'">'+x[1]+'</span>'}).join('')+'</div></div>';
+    if(m==='open'&&GM_CFG.end)h+='<div class="f"><div class="f-q" style="'+lab()+'">關閉後，學員點下去看到的提示（可留空）</div>'+
+      '<input class="f-in" id="gmNote" maxlength="60" value="'+hmEsc(GM_CFG.note)+'" placeholder="這一次的開放時間已經結束，謝謝參與！"></div>';
   }
-  h+='<div class="f" style="padding-top:14px"><div class="f-q" style="font-size:calc(13px*var(--fs));color:var(--muted)">學員點下去看到的提示（可留空）</div>'+
-    '<input class="f-in" id="gmNote" maxlength="60" value="'+hmEsc(GM_CFG.note)+'" placeholder="'+(m==='pause'?'例如：維修中，下課後再來':m==='scheduled'?'例如：課程結束後開放':'「情境學院」開發中，敬請期待')+'"></div>'+
-    '<p class="hint" style="margin-top:8px">要整塊磁磚隱藏，用上面「功能磁磚」的開關。</p>';
+  if(m!=='hidden')h+='<p class="hint" style="margin-top:2px">時間選好後按「儲存」，或直接點快速按鈕；提示文字打完按 Enter 或點別的地方就會存。</p>';
+  h+='<div class="ch-prev"><span class="ch-prev-k">學員現在看到</span>'+(m==='hidden'?'首頁沒有「情境學院」':
+     st.open?'可以直接進去玩'+(st.end?'，'+hmEsc(chFmt(st.end))+' 自動關閉':''):'<span class="ch-prev-t"><b>'+hmEsc(st.badge||'')+'</b>'+hmEsc(st.sub||'')+'</span>點了會跳出提示：'+hmEsc(st.note||''))+'</div>';
+  h+='<div class="section-head"><h2>自己先玩玩看</h2><span>不受狀態影響</span></div>'+
+    '<p class="sub">進「學員端預覽」後點「情境學院」磁磚，開發中、維修中、還沒到預約時間也進得去，方便上架前先測試（選「隱藏」時預覽裡也看不到磁磚）。</p>'+
+    '<button type="button" class="btn btn-quiet" data-gmpreview style="margin-top:6px">進學員端預覽試玩</button>';
+  var grp=function(ttl,L){return '<div class="gm-gh">'+ttl+'<span>'+L.length+' 個</span></div>'+L.map(function(g){
+      return '<div class="gm-row"><span class="gm-k">'+hmEsc(g.k||'')+'</span><span class="gm-t">'+hmEsc(g.t)+'<em>'+hmEsc(g.file)+'</em></span></div>'}).join('')};
+  h+='<div class="section-head"><h2>目前上架的情境</h2><span>'+gmCount()+'</span></div>'+
+    '<p class="sub">情境的題目、動畫和畫面在各自的情境檔案裡，改版時跟著檔案一起更新；這裡只管開放狀態。</p>'+
+    grp('急救現場',GM_GAMES.filter(function(g){return g.ready&&g.day}))+grp('求生現場',GM_GAMES.filter(function(g){return g.ready&&!g.day}));
   box.innerHTML=h;
 }
 async function gmSave(msg){
@@ -4522,10 +4556,45 @@ async function gmCommit(patch,msg){
   var ok=await gmSave(msg);
   if(!ok){GM_CFG=Object.assign({},GM_CFG,bak);renderGmAdmin();try{renderTiles()}catch(e){}}
 }
-document.addEventListener('click',function(e){
+async function gmSetHidden(hide){
+  var t=gmTile();
+  if(!t){t=Object.assign({},TILE_DEF.filter(function(x){return x.id==='scene'})[0]);TILES.push(t);}
+  var bak=t.on;if(t.on===!hide)return;
+  t.on=!hide;renderGmAdmin();try{renderTiles();paintHomeTiles()}catch(e){}
+  var ok=await gmSave(hide?'情境學院：隱藏':'情境學院：顯示');
+  if(!ok){t.on=bak;renderGmAdmin();try{renderTiles();paintHomeTiles()}catch(e){}}
+  return ok;
+}
+function gmQuickMs(kind,v){
+  var now=Date.now(),base=(kind==='end'&&GM_CFG.mode==='scheduled'&&GM_CFG.at>now)?GM_CFG.at:now,ms=0;
+  if(/^\d+m$/.test(v))ms=Math.ceil((base+parseInt(v,10)*60000)/60000)*60000;
+  else if(v==='tm9'){var d=new Date();d.setDate(d.getDate()+1);d.setHours(9,0,0,0);ms=d.getTime();}
+  else if(v==='td'){var d2=new Date(base);d2.setHours(23,59,0,0);ms=d2.getTime();}
+  return ms;
+}
+function gmCommitTime(k,ms){
+  var now=Date.now();
+  if(!ms||isNaN(ms)){toast(k==='at'?'先選開放時間':'先選關閉時間');return;}
+  if(k==='at'){
+    if(ms<=now&&!confirm('這個時間已經過了，存了就會直接開放。確定嗎？'))return;
+    if(GM_CFG.end&&ms>=GM_CFG.end){toast('開放時間要早於關閉時間（'+chFmt(GM_CFG.end)+'）');return;}
+    gmCommit({at:ms},'情境學院：預約 '+chFmt(ms)+' 開放');
+  }else{
+    if(ms<=now){toast('關閉時間要選未來的時間');return;}
+    if(GM_CFG.mode==='scheduled'&&GM_CFG.at&&ms<=GM_CFG.at){toast('關閉時間要晚於開放時間（'+chFmt(GM_CFG.at)+'）');return;}
+    gmCommit({end:ms},'情境學院：'+chFmt(ms)+' 自動關閉');
+  }
+}
+document.addEventListener('click',async function(e){
+  if(e.target.closest('#gmAdmin [data-gmpreview]')){enterPreview();return;}
+  var qk=e.target.closest('#gmAdmin [data-gmquick]');
+  if(qk){var pr=qk.dataset.gmquick.split(':');gmCommitTime(pr[0],gmQuickMs(pr[0],pr[1]));return;}
   var c=e.target.closest('#gmAdmin [data-gmmode]');
   if(c){
-    var v=c.dataset.gmmode,p={mode:v};
+    var v=c.dataset.gmmode;
+    if(v==='hidden'){await gmSetHidden(true);return;}
+    var gt=gmTile();if(!gt||!gt.on){if(!(await gmSetHidden(false)))return;}
+    var p={mode:v};
     if(v==='scheduled'&&(!GM_CFG.at||GM_CFG.at<Date.now())){var nx=new Date();nx.setMinutes(0,0,0);nx.setHours(nx.getHours()+1);p.at=nx.getTime();}
     if((v==='open'||v==='scheduled')&&GM_CFG.end&&GM_CFG.end<=Date.now())p.end=0;
     gmCommit(p,{soon:'情境學院：開發中',open:'情境學院：開放',pause:'情境學院：維修中',scheduled:'情境學院：預約開放'}[v]);
@@ -4533,20 +4602,18 @@ document.addEventListener('click',function(e){
   }
   var tb=e.target.closest('#gmAdmin [data-gmtime]');
   if(tb){
-    var k=tb.dataset.gmtime,now=Date.now();
+    var k=tb.dataset.gmtime;
     if(k==='clear'){gmCommit({end:0},'情境學院：取消自動關閉');return;}
-    var inp=$(k==='at'?'#gmAt':'#gmEnd'),ms=inp&&inp.value?new Date(inp.value).getTime():0;
-    if(!ms||isNaN(ms)){toast(k==='at'?'先選開放時間':'先選關閉時間');return;}
-    if(k==='at'){
-      if(ms<=now&&!confirm('這個時間已經過了，存了就會直接開放。確定嗎？'))return;
-      if(GM_CFG.end&&ms>=GM_CFG.end){toast('開放時間要早於關閉時間（'+chFmt(GM_CFG.end)+'）');return;}
-      gmCommit({at:ms},'情境學院：預約 '+chFmt(ms)+' 開放');
-    }else{
-      if(ms<=now){toast('關閉時間要選未來的時間');return;}
-      if(GM_CFG.mode==='scheduled'&&GM_CFG.at&&ms<=GM_CFG.at){toast('關閉時間要晚於開放時間（'+chFmt(GM_CFG.at)+'）');return;}
-      gmCommit({end:ms},'情境學院：'+chFmt(ms)+' 自動關閉');
-    }
+    var inp=$(k==='at'?'#gmAt':'#gmEnd');
+    gmCommitTime(k,inp&&inp.value?new Date(inp.value).getTime():0);
   }
+});
+document.addEventListener('input',function(e){
+  var el=e.target;if(!el||(el.id!=='gmAt'&&el.id!=='gmEnd'))return;
+  var b=$('#gmAdmin [data-gmtime="'+(el.id==='gmAt'?'at':'end')+'"]');if(b){b.classList.add('pending');b.textContent='儲存 ●';}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target&&e.target.id==='gmNote'){e.preventDefault();e.target.blur();}
 });
 document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='gmNote'){
@@ -9875,6 +9942,9 @@ function paintToday(){
   var cs=chState(),M={open:'開放中',pause:'維護中',scheduled:'預約',hidden:'隱藏',ended:'已結束'};
   var cp=$('#tdChPill');if(cp){cp.hidden=false;cp.textContent=M[cs.mode]||cs.mode;cp.style.borderColor=cs.open?'var(--ok)':'';cp.style.color=cs.open?'var(--ok)':'';}
   set('#tdChD',(cs.mode==='scheduled'?chFmt(CH_CFG.at)+' 自動開放．':'')+(CH_CFG.end&&cs.mode!=='hidden'?chFmt(CH_CFG.end)+' 關閉．':'')+'每次 '+chN()+' 題');
+  try{var gs=gmState(),GMW={open:'開放中',soon:'開發中',pause:'維修中',scheduled:'預約',hidden:'隱藏',ended:'已結束'};
+    var gp=$('#tdGmPill');if(gp){gp.hidden=false;gp.textContent=GMW[gs.mode]||gs.mode;gp.style.borderColor=gs.open?'var(--ok)':'';gp.style.color=gs.open?'var(--ok)':'';}
+    set('#tdGmD',(gs.mode==='scheduled'?chFmt(GM_CFG.at)+' 自動開放．':'')+(GM_CFG.end&&(gs.mode==='open'||gs.mode==='scheduled')?chFmt(GM_CFG.end)+' 關閉．':'')+gmCount());}catch(e){}
   set('#homeTag',TILES.filter(function(t){return t.on}).length+' 個功能開著．'+TILES.filter(function(t){return !t.on}).length+' 個關閉');
   paintHomeTiles();
 }
@@ -9894,7 +9964,7 @@ setInterval(function(){if(document.body.classList.contains('adm-on')&&ATAB==='to
 function paintHomeTiles(){
   var box=$('#homeTiles');if(!box)return;
   box.innerHTML=TILES.map(function(t){
-    var note=t.id==='about'?'首頁的講師名牌':t.id==='quiz'?'測驗、回饋、成績都在裡面':t.id==='feedback'?(TILES.some(function(x){return x.id==='quiz'&&x.on})?'已放進上課專區（首頁不另外顯示）':'上課專區關閉時，首頁會顯示這一格'):(t.d||hmDescDef(t));
+    var note=t.id==='about'?'首頁的講師名牌':t.id==='quiz'?'測驗、回饋、成績都在裡面':t.id==='feedback'?(TILES.some(function(x){return x.id==='quiz'&&x.on})?'已放進上課專區（首頁不另外顯示）':'上課專區關閉時，首頁會顯示這一格'):t.id==='scene'?'開放、維修、預約時間在「題庫 › 情境學院」':t.id==='challenge'?'開放、維護、預約時間在「題庫 › 挑戰題庫」':(t.d||hmDescDef(t));
     return '<div class="ht-row'+(t.on?'':' off')+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[t.icon]||ICONS.link)+'</svg>'+
       '<span class="ht-t">'+hmEsc(t.t)+'<em>'+hmEsc(note)+'</em></span>'+
       '<span class="sw'+(t.on?' on':'')+'" data-htile="'+hmEsc(t.id)+'" role="switch" aria-checked="'+(!!t.on)+'" tabindex="0" aria-label="'+hmEsc(t.t)+'"></span></div>';
@@ -11410,6 +11480,24 @@ function renderTraffic(){renderTrafficOld();try{renderWeek()}catch(e){}try{fileS
 /* ===== v11.40 更新說明：登入後台的人，第一次打開新版會跳出「從上次看過到現在」所有改動（沒登入的人不會看到）===== */
 /* 以後每次更新：在 CHANGELOG 最上面加一筆，並同步改 APP_VERSION */
 var CHANGELOG=[
+ {v:'v11.58',d:'2026/11/10',items:[
+  '行動電源：流程排序改成只排「起火當下」的四步（不靠近先喊、不靠近滅火、關門報案、交接消防隊）；「隔天怎麼買、怎麼充」還是一題，但不放進排序裡。追問題重複的「買行動電源要注意什麼」換成「夏天可以把行動電源放在車上嗎」。',
+  '瓦斯：「就著客廳的燈光走過去」改成「靠客廳透進來的光走進廚房」。',
+  '地震：拿掉瓦斯外洩，改成單純的地震情境，變成五段：趴下掩護穩住 → 搖晃停了先穿鞋、拿避難包、開門離開 → 走樓梯疏散 → 到家人事先約好的集合地點（巷口公園）→ 用 LINE、簡訊等文字訊息報平安。拿掉 1991 報平安專線，新增「約定集合地點」「怎麼報平安」兩題追問題。',
+  '百貨公司：一開始 5 樓走道沒有煙（只有警報和廣播），樓梯間的煙是從 3 樓往上竄；退回 4 樓時，4 樓走道沒有煙，樓層指南也顯示 4F。手背改成確實貼在防火門上方、靠近上面門縫的地方。',
+  '一氧化碳：第 4 段「改善」做成動畫：技術士拆掉浴室裡的熱水器 → 改裝到室外開放的陽台（上方排氣罩把廢氣排到外面），並說明室內要用強制排氣型 → 在臥室門口附近的天花板裝一氧化碳警報器、按測試鍵。陽台封鋁窗的錯誤選項也有畫面。',
+  '延長線：過載時整條線都在高溫，改成「不要用手拔插頭」（拔插頭改為錯誤選項，會被燙傷）；正確做法是先大喊家人，再到大門邊的配電箱把插座那一路的電關掉。第 3 段換掉「打 119 請消防人員檢查插座」，改成「確認火完全熄了、開窗通風，燒過的延長線直接丟掉」；滅火器噴完還滅不了才離開、關門、打 119。流程排序第一步改成「喊人、斷電」。',
+  '所有火災情境再檢查一次：喊人一律放在第一步（公寓、油鍋、延長線、行動電源、百貨公司）。',
+  '居家消防器材：說明不再用浮動視窗蓋住平面圖，改成放在圖的下方；每一題選完都會先播概念動畫，可以按「跳過」或「再看一次動畫」：滅火器（主臥室起火，從大門拿滅火器 → 滅不了往回走就是出口；放錯位置時拿不到或被火擋住）、住警器種類（廚房油煙誤報、只有臥室裝一顆會晚好幾分鐘）、住警器位置（煙往上衝、沿天花板擴散、牆角死角、出風口吹散）、瓦斯偵測器（天然氣往上飄、桶裝瓦斯往下沉、半夜沒插電沒人知道）、一氧化碳警報器（半夜擴散、臥室門口最快響、裝在熱水器上方會一直誤報）。',
+  '需重新上傳到前台：scene-pbank.html、scene-gas.html、scene-quake.html、scene-mall.html、scene-co.html、scene-cord.html、scene-equip.html，以及 student.html、backend.html。其他情境檔也有一起重建（共用的流程排序程式有小改），建議全部一起上傳：scene-burn、bleed、cpr、choke、pan。']},
+ {v:'v11.57',d:'2026/11/09',items:[
+  '後台：「情境學院」的開放設定搬到「題庫」分頁，和「挑戰題庫」放在一起（題庫分頁上方多了「情境學院」一格）。原本夾在「內容 › 學員首頁」磁磚和品牌圖中間，很難找。',
+  '情境學院設定改成和挑戰題庫同一套樣式：開發中／開放／維修中／預約開放／隱藏五個大按鈕；預約和自動關閉多了快速按鈕（10 分鐘後、1 小時後、明天 09:00、今天 23:59…）；下面直接顯示「學員現在看到」什麼。',
+  '情境學院多了「隱藏」：按了首頁就看不到這塊磁磚，不用再到功能磁磚去關。',
+  '情境學院設定裡加了「進學員端預覽試玩」按鈕，以及目前上架的情境清單（急救現場、求生現場各幾個）。',
+  '「課程」分頁的「其他」多一列「情境學院」，顯示目前狀態和開放、關閉時間，點了直接跳過去。',
+  '「內容 › 學員首頁 › 功能磁磚」裡，挑戰題庫和情境學院那兩列的小字改成告訴你狀態要到哪裡設。',
+  '只需要重新上傳 backend.html 和 student.html（學員端只有版本號改變）。']},
  {v:'v11.56',d:'2026/11/08',items:[
   '全部情境：字幕改成「讀完才換下一句」。每句字幕依字數至少停留約 1 到 6.5 秒，前一句還沒讀完時，劇情會先停下來等，不會一閃而過。',
   '流程排序：加上引導。上方先說明現在的情境，並提示「現在請點：第幾步（共幾步）」、要接在哪一步之後；下方的格子會顯示已經排好的步驟。',
